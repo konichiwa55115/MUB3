@@ -455,7 +455,7 @@ async def callback_query(CLIENT,CallbackQuery):
   elif CallbackQuery.data == "audconv" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
    cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
-   await  bot.send_audio(user_id, f)
+   await  bot.send_audio(user_id, mp3file)
    os.remove(file_path) 
    os.remove(mp3file) 
   elif CallbackQuery.data == "audconvm4a" :
