@@ -342,28 +342,27 @@ def command2(bot,message):
     os.remove("yttransy.txt")
     
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
-def _telegram_file(client, message):
-  global user_id ,file_path,filename,nom,ex,mp4file,mp3file,m4afile,spdrateaud,mergdir,trimdir,result,nepho
-  nepho = message
-  user_id = nepho.from_user.id
-  x =  nepho.download(file_name="./downloads/")
-  file_path = x.replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
-  if file_path == x :
+async def _telegram_file(client, message):
+ global user_id ,file_path,filename,nom,ex,mp4file,mp3file,m4afile,spdrateaud,mergdir,trimdir,result,nepho
+ nepho = message
+ user_id = nepho.from_user.id
+ x =  await nepho.download(file_name="./downloads/")
+ file_path = x.replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
+ if file_path == x :
      pass
-  else :
+ else :
      os.rename(x,file_path)
-  nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
-  filename = os.path.basename(file_path)
-  nom,ex = os.path.splitext(filename)
-  mp4file = f"{nom}.mp4"
-  mp3file = f"{nom}.mp3"
-  m4afile = f"{nom}.m4a"
-  mergdir = f"./mergy/{mp3file}"
-  trimdir = f"./trimmo/{mp3file}" 
-  result = f"{nom}.txt"
-      
-@bot.on_callback_query()
-async def callback_query(CLIENT,CallbackQuery): 
+ await nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
+ filename = os.path.basename(file_path)
+ nom,ex = os.path.splitext(filename)
+ mp4file = f"{nom}.mp4"
+ mp3file = f"{nom}.mp3"
+ m4afile = f"{nom}.m4a"
+ mergdir = f"./mergy/{mp3file}"
+ trimdir = f"./trimmo/{mp3file}" 
+ result = f"{nom}.txt"    
+ @bot.on_callback_query()
+ async def callback_query(CLIENT,CallbackQuery): 
   global amplemode
   await CallbackQuery.edit_message_text("جار العمل")
   if CallbackQuery.data == "amplifyaud":
@@ -493,10 +492,10 @@ async def callback_query(CLIENT,CallbackQuery):
 
   elif CallbackQuery.data == "aud":
     await CallbackQuery.edit_message_text("جار التضخيم ")
-    cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{filename}"''')
-    await bot.send_audio(user_id, filename)
+    cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+    await bot.send_audio(user_id, mp3file)
     os.remove(file_path) 
-    os.remove(filename) 
+    os.remove(mp3file) 
 
   elif CallbackQuery.data == "vid":
     await CallbackQuery.edit_message_text("جار التضخيم " )
@@ -861,8 +860,6 @@ async def callback_query(CLIENT,CallbackQuery):
         os.remove(subfile)
         os.remove(vidfile)
         os.remove(mp4file)
-
-
 
      
 
