@@ -21,7 +21,7 @@ bot = Client(
     "audiobot",
     api_id=17983098,
     api_hash="ee28199396e0925f1f44d945ac174f64",
-    bot_token="6709809460:AAGWWXJBNMF_4ohBNRS22Tg0Q3-vkm376Eo"
+    bot_token="6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM"
 )
 #6032076608:AAGhqffAlibHd7pipzA3HR2-0Ca3sDFlmdI 
 #5782497998:AAFdx2dX3yeiyDIcoJwPa_ghY2h_dozEh_E
@@ -340,12 +340,19 @@ def command2(bot,message):
 def command2(bot,message):
     os.remove("ytplst.txt")
     os.remove("yttransy.txt")
-    
+queeq = []   
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
 async def _telegram_file(client, message):
  global user_id ,file_path,filename,nom,ex,mp4file,mp3file,m4afile,spdrateaud,mergdir,trimdir,result,nepho
+ if len(queeq) == 0 : 
+    pass
+ else :
+    await asyncio.sleep(30)
+    queeq.clear()
+    pass
  nepho = message
  user_id = nepho.from_user.id
+ queeq.append(user_id)
  x =  await nepho.download(file_name="./downloads/")
  file_path = x.replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
  if file_path == x :
@@ -860,6 +867,8 @@ async def _telegram_file(client, message):
         os.remove(subfile)
         os.remove(vidfile)
         os.remove(mp4file)
+  queeq.clear()
+
 
      
 
