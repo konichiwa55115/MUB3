@@ -5,7 +5,7 @@ imagepdfdic1 = []
 vidsrt = []
 temptxt = "res.txt"
 from pyrogram import Client, filters 
-import os ,re , random ,shutil,asyncio ,pytesseract,requests  
+import os ,re , random ,shutil,asyncio ,pytesseract,requests
 from os import system as cmd
 from pyrogram.types import InlineKeyboardMarkup , InlineKeyboardButton , ReplyKeyboardMarkup , CallbackQuery , ForceReply
 import pypdfium2 as pdfium
@@ -76,6 +76,15 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
 PRESS_MERGE_IMAGE = "الآن أرسل الصورة الأخرى و اختر دمج الآن "
 PRESS_MERGE_IMAGE_BUTTONS = [
     [InlineKeyboardButton("دمج الآن ",callback_data="imagemergenow")]
+     ]
+CHOOSE_UR_TRIMMODE = "اختر نمط القص"
+CHOOSE_UR_TRIMMODE_BUTTONS = [
+    [InlineKeyboardButton("قص عادي",callback_data="normaltrim")],
+    [InlineKeyboardButton("قص معكوس",callback_data="reversetrim")]
+     ]
+CHOOSE_UR_RTRIMFILE_MODE = "اختر نوع ملفك "
+CHOOSE_UR_RTRIMFILE_MODE_BUTTONS = [   
+    [InlineKeyboardButton("صوتية",callback_data="rtrimaud")]
      ]
 PRESS_MERGEMODE_IMAGE = "اختر نمط الدمج "
 PRESS_MERGEMODE_IMAGE_BUTTONS = [
@@ -867,6 +876,36 @@ async def _telegram_file(client, message):
         os.remove(subfile)
         os.remove(vidfile)
         os.remove(mp4file)
+  elif CallbackQuery.data == "normaltrim" :
+         await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILETRIM_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILETRIM_MODE_BUTTONS))
+  elif CallbackQuery.data == "reversetrim" :
+         await CallbackQuery.edit_message_text(text = CHOOSE_UR_RTRIMFILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_RTRIMFILE_MODE_BUTTONS))
+  elif CallbackQuery.data == "rtrimaud" :
+     starsec = re.split(':',strt_point)
+     if len(starsec) == 3 :
+        strtseconds = int(starsec[0])*60*60 + int(starsec[1])*60 + int(starsec[2])
+     elif len(starsec) == 2 : 
+         strtseconds = int(starsec[0])*60 + int(starsec[1])
+     elif len(starsec) == 1 : 
+        strtseconds =  int(starsec[0])
+     endsec = re.split(':',end_point)
+     if len(endsec) == 3 :
+        endseconds = int(endsec[0])*60*60 + int(endsec[1])*60 + int(endsec[2])
+     elif len(endsec) == 2 : 
+         endseconds = int(endsec[0])*60 + int(endsec[1])
+     elif len(endsec) == 1 : 
+        endseconds =  int(endsec[0])
+     print(strtseconds)
+     print(endseconds)
+     cmd(f'''ffmpeg -i {file_path} -af "aselect='not(between(t,{strtseconds},{endseconds}))'" "{mp3file}"''')
+     await bot.send_audio(user_id,mp3file)
+     os.remove(mp3file)
+     os.remove(file_path)
+
+     
+
+
+     
   queeq.clear()
 
 
@@ -896,7 +935,6 @@ async def refunc(client,message):
 @bot.on_message(filters.private & filters.reply & filters.regex('/'))
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
-          nepho.delete()
           endstart = message.text 
           msgid = message.reply_to_message_id
           await bot.delete_messages(user_id,msgid)
@@ -905,7 +943,7 @@ async def refunc(client,message):
           global end_point
           strt, end = os.path.split(endstart);strt_point=strt 
           end_point = end
-          await message.reply(text = CHOOSE_UR_FILETRIM_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILETRIM_MODE_BUTTONS))
+          await message.reply(text = CHOOSE_UR_TRIMMODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_TRIMMODE_BUTTONS))
 @bot.on_message(filters.private & filters.reply & filters.regex("-"))
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
