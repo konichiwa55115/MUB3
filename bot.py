@@ -895,9 +895,7 @@ async def _telegram_file(client, message):
          endseconds = int(endsec[0])*60 + int(endsec[1])
      elif len(endsec) == 1 : 
         endseconds =  int(endsec[0])
-     print(strtseconds)
-     print(endseconds)
-     cmd(f'''ffmpeg -i {file_path} -af "aselect='not(between(t,{strtseconds},{endseconds}))'" "{mp3file}"''')
+     cmd(f'''ffmpeg -i "{file_path}" -af "aselect='not(between(t,{strtseconds},{endseconds}))'" "{mp3file}"''')
      await bot.send_audio(user_id,mp3file)
      os.remove(mp3file)
      os.remove(file_path)
