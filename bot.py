@@ -633,7 +633,7 @@ async def _telegram_file(client, message):
     os.remove("list.txt")
     os.remove(mp3file)
     shutil.rmtree('./mergy/') 
-    audmergelist.clear
+    audmergelist.clear()
   elif CallbackQuery.data == "splitty":
     await CallbackQuery.edit_message_text("جار التقسيم") 
     cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a mod.mp3 -y''')
