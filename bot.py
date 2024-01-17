@@ -3,6 +3,7 @@ imagedic = []
 imagepdfdic = []
 imagepdfdic1 = []
 vidsrt = []
+audmergelist = []
 temptxt = "res.txt"
 from pyrogram import Client, filters 
 import os ,re , random ,shutil,asyncio ,pytesseract,requests
@@ -256,7 +257,6 @@ def command4(bot,message):
 @bot.on_message(filters.command('ytplst') & filters.text & filters.private)
 def command4(bot,message):
      x = message.text.split(" ")[1]
-     print(x)
      url = x.split(" ")[0]
      dlmode = message.text.split(" ")[-1] 
      global ytplstid
@@ -614,19 +614,23 @@ async def _telegram_file(client, message):
 
   elif CallbackQuery.data == "audmerge":
     await CallbackQuery.edit_message_text("جار الإضافة ")
-    cmd(f'''mkdir mergy''')
-    mp3merge = f"{nom}{random.randint(0,100)}.mp3"
-    cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3merge}" -y ''')
-    os.remove(file_path)
-    with open('list.txt','a') as f:
-      f.write(f'''file '{mp3merge}' \n''')
+    audmergelist.append(file_path)
     await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
   elif CallbackQuery.data == "mergenow":
     await CallbackQuery.edit_message_text("جار الدمج") 
+    cmd(f'''mkdir mergy''')
+    for x in range(0,len(audmergelist)) :
+     mp3merge = f"{nom}{random.randint(0,100)}.mp3"
+     cmd(f'''ffmpeg -i "{audmergelist[x]}" -q:a 0 -map a "{mp3merge}" -y ''')
+     os.remove(audmergelist[x])
+     with open('list.txt','a') as f:
+      f.write(f'''file '{mp3merge}' \n''')
     cmd(f'''ffmpeg -f concat -safe 0 -i list.txt "{mp3file}" -y ''')
     await bot.send_audio(user_id, mp3file)
-    cmd(f'''rm list.txt "{mp3file}" ''')
+    os.remove("list.txt")
+    os.remove(mp3file)
     shutil.rmtree('./mergy/') 
+    audmergelist.clear
   elif CallbackQuery.data == "splitty":
     await CallbackQuery.edit_message_text("جار التقسيم") 
     cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a mod.mp3 -y''')
