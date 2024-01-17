@@ -349,6 +349,9 @@ def command2(bot,message):
 def command2(bot,message):
     os.remove("ytplst.txt")
     os.remove("yttransy.txt")
+    shutil.rmtree("./mergy/")
+    shutil.rmtree("./downloads/")
+
 queeq = []   
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
 async def _telegram_file(client, message):
