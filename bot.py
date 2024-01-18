@@ -920,11 +920,15 @@ async def _telegram_file(client, message):
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
   elif  CallbackQuery.data == "vidmergenow" :
      for x in range(0,len(vidmergelist)) :
+      cmd('mkdir vidmerge2')
+      mergeviditem = f"./vidmerge2/{random.randint(1,100)}.mp4"
+      cmd(f'''ffmpeg -y -i "{vidmergelist[x]}" -vf "setpts=1*PTS" -r 15 "{mergeviditem}"''')
       with open('vidlist.txt','a') as f:
-       f.write(f'''file '{vidmergelist[x]}' \n''')  
+       f.write(f'''file '{mergeviditem}' \n''')  
+     shutil.rmtree("./vidmerge/") 
      cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "{mp4file}"''') 
      await bot.send_video(user_id,mp4file)
-     shutil.rmtree("./vidmerge/")
+     shutil.rmtree("./vidmerge2/")
      os.remove(mp4file)
      os.remove("vidlist.txt")
      vidmergelist.clear()
