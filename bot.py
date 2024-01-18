@@ -926,7 +926,9 @@ async def _telegram_file(client, message):
       with open('vidlist.txt','a') as f:
        f.write(f'''file '{mergeviditem}' \n''')  
      shutil.rmtree("./vidmerge/") 
-     cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "{mp4file}"''') 
+     cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "./vidmerge2/{mp4file}"''') 
+     cmd(f'''ffmpeg -i "./vidmerge2/{mp4file}" -q:a 0 -map a "./vidmerge2/{mp3file}" -y ''')
+     cmd(f'''ffmpeg -i "./vidmerge2/{mp4file}" -i "./vidmerge2/{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
      await bot.send_video(user_id,mp4file)
      shutil.rmtree("./vidmerge2/")
      os.remove(mp4file)
