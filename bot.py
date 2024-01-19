@@ -926,16 +926,18 @@ async def _telegram_file(client, message):
      for x in range(0,len(vidmergelist)) :
       cmd('mkdir vidmerge2')
       mergeviditem = f"./vidmerge2/{random.randint(1,100)}.mp4"
-      cmd(f'''ffmpeg -y -i "{vidmergelist[x]}" -vf "setpts=1*PTS" -r 15 "{mergeviditem}"''')
+      cmd(f'''ffmpeg -y -i "{vidmergelist[x]}" -vf "setpts=1*PTS" -r 30 "{mergeviditem}"''')
       with open('vidlist.txt','a') as f:
        f.write(f'''file '{mergeviditem}' \n''')  
      shutil.rmtree("./vidmerge/") 
-     cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "./vidmerge2/{mp4file}"''') 
-     cmd(f'''ffmpeg -i "./vidmerge2/{mp4file}" -q:a 0 -map a "./vidmerge2/{mp3file}" -y ''')
-     cmd(f'''ffmpeg -i "./vidmerge2/{mp4file}" -i "./vidmerge2/{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
+     cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "mod{mp4file}"''') 
+     cmd(f'''ffmpeg -i "mod{mp4file}" -q:a 0 -map a "{mp3file}" -y ''')
+     cmd(f'''ffmpeg -i "mod{mp4file}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
      await bot.send_video(user_id,mp4file)
      shutil.rmtree("./vidmerge2/")
      os.remove(mp4file)
+     os.remove(mp3file)
+     os.remove(f'''mod{mp4file}''')
      os.remove("vidlist.txt")
      vidmergelist.clear()
      
