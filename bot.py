@@ -349,9 +349,12 @@ def command2(bot,message):
 def command2(bot,message):
     os.remove("ytplst.txt")
     os.remove("yttransy.txt")
+    shutil.rmtree("./mergy/")
+    shutil.rmtree("./vidmerge/")
+    shutil.rmtree("./vidmerge2/")
+    shutil.rmtree("./downloads/")
     audmergelist.clear()
-    os.remove("./downloads/")
-    os.remove("./mergy/")
+    vidmergelist.clear()
 
 
 queeq = []   
