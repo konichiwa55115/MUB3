@@ -917,29 +917,24 @@ async def _telegram_file(client, message):
      os.remove(mp3file)
      os.remove(file_path)
   elif  CallbackQuery.data == "vidmerge" :
-     cmd('mkdir vidmerge')
-     mergeviditem = f"./vidmerge/{random.randint(1,100)}.mp4"
+     cmd('mkdir data')
+     mergeviditem = f"./data/{random.randint(1,100)}.mp4"
      os.rename(file_path,mergeviditem)
      vidmergelist.append(mergeviditem)
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
   elif  CallbackQuery.data == "vidmergenow" :
-     for x in range(0,len(vidmergelist)) :
-      cmd('mkdir vidmerge2')
-      mergeviditem = f"./vidmerge2/{random.randint(1,100)}.mp4"
-      cmd(f'''ffmpeg -y -i "{vidmergelist[x]}" -vf "setpts=1*PTS" -r 30 "{mergeviditem}"''')
-      with open('vidlist.txt','a') as f:
-       f.write(f'''file '{mergeviditem}' \n''')  
-     shutil.rmtree("./vidmerge/") 
-     cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "mod{mp4file}"''') 
-     cmd(f'''ffmpeg -i "mod{mp4file}" -q:a 0 -map a "{mp3file}" -y ''')
-     cmd(f'''ffmpeg -i "mod{mp4file}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
+     if len(vidmergelist) == 2 : 
+        cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "{mp4file}"''') 
+        pass
+     else :
+        await CallbackQuery.edit_message_text("البوت يدعم دمج فيدوين فقط ")
+        shutil.rmtree("./data/")
+ 
      await bot.send_video(user_id,mp4file)
-     shutil.rmtree("./vidmerge2/")
+     shutil.rmtree("./data/")
      os.remove(mp4file)
-     os.remove(mp3file)
-     os.remove(f'''mod{mp4file}''')
-     os.remove("vidlist.txt")
      vidmergelist.clear()
+     
      
 
      
