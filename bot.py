@@ -4,6 +4,7 @@ imagepdfdic = []
 imagepdfdic1 = []
 vidsrt = []
 audmergelist = []
+vidmergelist = []
 temptxt = "res.txt"
 from pyrogram import Client, filters 
 import os ,re , random ,shutil,asyncio ,pytesseract,requests
@@ -65,7 +66,7 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("تفريغ صوتية",callback_data="transcribe"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
     [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("كتم صوت الفيديو",callback_data="mute")],
     [InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp")],
-    [InlineKeyboardButton("دمج الترجمة مع الفيديو",callback_data="vidsrt")],
+    [InlineKeyboardButton("دمج الترجمة مع الفيديو",callback_data="vidsrt"),InlineKeyboardButton("دمج الفيديو",callback_data="vidmerge")],
     [InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("OCR صور",callback_data="OCR")],
     [InlineKeyboardButton("تفريغ pdf",callback_data="pdfOCR"),InlineKeyboardButton("ضغط pdf",callback_data="pdfcompress")],
     [InlineKeyboardButton("دمج pdf",callback_data="pdfmerge"),InlineKeyboardButton("قص pdf ",callback_data="pdftrim")],
@@ -78,6 +79,11 @@ PRESS_MERGE_IMAGE = "الآن أرسل الصورة الأخرى و اختر د�
 PRESS_MERGE_IMAGE_BUTTONS = [
     [InlineKeyboardButton("دمج الآن ",callback_data="imagemergenow")]
      ]
+CHOOSE_UR_VIDMERGE_MODE = "الآن أرسل الفيديوهات الأخرى و اختر دمج الآن "
+CHOOSE_UR_VIDMERGE_MODE_BUTTONS= [
+    [InlineKeyboardButton("دمج الآن ",callback_data="vidmergenow")]
+     ]
+
 CHOOSE_UR_TRIMMODE = "اختر نمط القص"
 CHOOSE_UR_TRIMMODE_BUTTONS = [
     [InlineKeyboardButton("قص عادي",callback_data="normaltrim")],
@@ -355,7 +361,6 @@ def command2(bot,message):
     shutil.rmtree("./downloads/")
     audmergelist.clear()
     vidmergelist.clear()
-
 
 queeq = []   
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
@@ -911,6 +916,29 @@ async def _telegram_file(client, message):
      await bot.send_audio(user_id,mp3file)
      os.remove(mp3file)
      os.remove(file_path)
+  elif  CallbackQuery.data == "vidmerge" :
+     cmd('mkdir vidmerge')
+     mergeviditem = f"./vidmerge/{random.randint(1,100)}.mp4"
+     os.rename(file_path,mergeviditem)
+     vidmergelist.append(mergeviditem)
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
+  elif  CallbackQuery.data == "vidmergenow" :
+     for x in range(0,len(vidmergelist)) :
+      cmd('mkdir vidmerge2')
+      mergeviditem = f"./vidmerge2/{random.randint(1,100)}.mp4"
+      cmd(f'''ffmpeg -y -i "{vidmergelist[x]}" -vf "setpts=1*PTS" -r 15 "{mergeviditem}"''')
+      with open('vidlist.txt','a') as f:
+       f.write(f'''file '{mergeviditem}' \n''')  
+     shutil.rmtree("./vidmerge/") 
+     cmd(f'''ffmpeg -f concat -safe 0 -i vidlist.txt -c copy "./vidmerge2/{mp4file}"''') 
+     cmd(f'''ffmpeg -i "./vidmerge2/{mp4file}" -q:a 0 -map a "./vidmerge2/{mp3file}" -y ''')
+     cmd(f'''ffmpeg -i "./vidmerge2/{mp4file}" -i "./vidmerge2/{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
+     await bot.send_video(user_id,mp4file)
+     shutil.rmtree("./vidmerge2/")
+     os.remove(mp4file)
+     os.remove("vidlist.txt")
+     vidmergelist.clear()
+     
 
      
 
