@@ -195,7 +195,7 @@ CHOOSE_UR_RESO_MODE_BUTTONS = [
 
 @bot.on_message(filters.command('start') & filters.private)
 def command1(bot,message):
-    bot.send_message(message.chat.id, " السلام عليكم أنا بوت متعدد الاستعمالات , فقط أرسل الفيديو أو الصوتية هنا\n\n  لبقية البوتات هنا \n\n https://t.me/sunnay6626/2 ",disable_web_page_preview=True)
+    bot.send_message(message.chat.id, " السلام عليكم أنا بوت متعدد الاستعمالات , فقط أرسل الفيديو أو الصوتية أو الملف هنا\n\n [طريقة استعمال البوت](https://telegra.ph/%D8%B7%D8%B1%D9%8A%D9%82%D8%A9-%D8%A7%D8%B3%D8%AA%D8%B9%D9%85%D8%A7%D9%84-%D8%A7%D9%84%D8%A8%D9%88%D8%AA-01-20) \n\n [لبقية البوتات](https://t.me/sunnay6626/2) ",disable_web_page_preview=True)
 
 @bot.on_message(filters.command('setbucket') & filters.text & filters.private)
 def command9(bot,message):
