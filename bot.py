@@ -156,12 +156,7 @@ CHOOSE_UR_FILETRIM_MODE_BUTTONS = [
     [InlineKeyboardButton("صوتية",callback_data="audtrim")],
      [InlineKeyboardButton("فيديو ",callback_data="vidtrim")]
      ]
-CHOOSE_UR_FILERENM_MODE = "اختر نوع ملفك "
-CHOOSE_UR_FILERENM_MODE_BUTTONS = [
-    [InlineKeyboardButton("صوتية",callback_data="audrenm")],
-     [InlineKeyboardButton("فيديو ",callback_data="vidrenm")],
-     [InlineKeyboardButton("وثيقة",callback_data="docrenm")]
-]
+
 CHOOSE_UR_FILESPED_MODE = "اختر نوع ملفك "
 CHOOSE_UR_FILESPED_MODE_BUTTONS = [
     [InlineKeyboardButton("صوتية",callback_data="speedfileaud")],
@@ -359,8 +354,6 @@ def command2(bot,message):
     shutil.rmtree("./downloads/")
     audmergelist.clear()
     vidmergelist.clear()
-    vidsubslist.clear()
-
 
 queeq = []   
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
@@ -433,6 +426,7 @@ async def _telegram_file(client, message):
         await CallbackQuery.edit_message_text("الآن أرسل الفيديو")
       elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(vidsubslist) == 1 :
        await CallbackQuery.edit_message_text("جار الإبدال ") 
+       print(vidsubslist[0])
        cmd(f'''ffmpeg -i "{vidsubslist[0]}" -i "{file_path}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id, mp4file)
        os.remove(file_path) 
@@ -525,7 +519,7 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "audconvm4a" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
    cmd(f'''ffmpeg -i "{file_path}" -c:a aac -b:a 192k "{m4afile}" -y ''')
-   await bot.send_document(user_id, m4afile)
+   await bot.send_audio(user_id, m4afile)
    os.remove(file_path) 
    os.remove(m4afile) 
 
@@ -541,65 +535,81 @@ async def _telegram_file(client, message):
    await CallbackQuery.edit_message_text("👇") 
   elif CallbackQuery.data == "mod1":
       amplemode = 5
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILE_MODE_BUTTONS))
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        await bot.send_audio(user_id, mp3file)
+        os.remove(file_path) 
+        os.remove(mp3file) 
+      elif (ex == ".mp4" or ex == ".mkv") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
+        await bot.send_video(user_id, filename) 
+        os.remove(file_path) 
+        os.remove(filename) 
+
   elif CallbackQuery.data == "mod2":
       amplemode = 10
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILE_MODE_BUTTONS))
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        await bot.send_audio(user_id, mp3file)
+        os.remove(file_path) 
+        os.remove(mp3file) 
+      elif (ex == ".mp4" or ex == ".mkv") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
+        await bot.send_video(user_id, filename) 
+        os.remove(file_path) 
+        os.remove(filename)
   elif CallbackQuery.data == "mod3":
       amplemode = 15
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILE_MODE_BUTTONS))
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        await bot.send_audio(user_id, mp3file)
+        os.remove(file_path) 
+        os.remove(mp3file) 
+      elif (ex == ".mp4" or ex == ".mkv") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
+        await bot.send_video(user_id, filename) 
+        os.remove(file_path) 
+        os.remove(filename)
   elif CallbackQuery.data == "mod4" :
       amplemode = 20
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILE_MODE_BUTTONS))
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        await bot.send_audio(user_id, mp3file)
+        os.remove(file_path) 
+        os.remove(mp3file) 
+      elif (ex == ".mp4" or ex == ".mkv") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
+        await bot.send_video(user_id, filename) 
+        os.remove(file_path) 
+        os.remove(filename)
   elif CallbackQuery.data == "mod5":
       amplemode = 25
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILE_MODE_BUTTONS) )
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        await bot.send_audio(user_id, mp3file)
+        os.remove(file_path) 
+        os.remove(mp3file) 
+      elif (ex == ".mp4" or ex == ".mkv") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
+        await bot.send_video(user_id, filename) 
+        os.remove(file_path) 
+        os.remove(filename)
 
-  elif CallbackQuery.data == "aud":
-    await CallbackQuery.edit_message_text("جار التضخيم ")
-    cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-    await bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file) 
 
-  elif CallbackQuery.data == "vid":
-    await CallbackQuery.edit_message_text("جار التضخيم " )
-    cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-    cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
-    await bot.send_video(user_id, filename) 
-    os.remove(file_path) 
-    os.remove(filename) 
-
-  elif CallbackQuery.data == "audtrim":
-    await CallbackQuery.edit_message_text("جار القص")  
-    cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "trim{mp3file}" -y ''')
-    cmd(f'''ffmpeg -i "trim{mp3file}" -ss {strt_point} -to {end_point} -c copy "{mp3file}" -y ''')
-    await  bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file) 
-    os.remove(f"trim{mp3file}")
-      
-  elif CallbackQuery.data == "vidtrim":
-    await CallbackQuery.edit_message_text("جار القص")  
-    cmd(f'''ffmpeg -i "{file_path}" -ss {strt_point} -strict -2 -to {end_point} -c:a aac -codec:v h264 -b:v 1000k "{mp4file}" -y ''')
-    await bot.send_video(user_id, mp4file)   
-    os.remove(file_path) 
-    os.remove(mp4file) 
   elif CallbackQuery.data == "renm":
     await CallbackQuery.edit_message_text("👇") 
     await nepho.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
-  elif CallbackQuery.data == "audrenm":
-    await CallbackQuery.edit_message_text("👇")
-    await  bot.send_audio(user_id, newfile)
-    os.remove(newfile)
-  elif CallbackQuery.data == "vidrenm":
-    await CallbackQuery.edit_message_text("👇")
-    await  bot.send_video(user_id, newfile)
-    os.remove(newfile)
-  elif CallbackQuery.data == "docrenm":
-    await CallbackQuery.edit_message_text("👇")
-    await bot.send_document(user_id, newfile)
-    os.remove(newfile)
+  
   elif CallbackQuery.data == "transcribe":
     try: 
       with open('transcription.txt', 'r') as fh:
@@ -633,33 +643,65 @@ async def _telegram_file(client, message):
     spdratevid = 0.8
     global spdrateaud
     spdrateaud = 1.25
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILESPED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILESPED_MODE_BUTTONS))
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+      await CallbackQuery.edit_message_text("جار التسريع")
+      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
+      await bot.send_audio(user_id, mp3file) 
+      os.remove(file_path) 
+      os.remove(mp3file) 
+    elif (ex == ".mp4" or ex == ".mkv") :
+       await CallbackQuery.edit_message_text("جار التسريع")
+       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
+       await  bot.send_video(user_id,mp4file)
+       os.remove(file_path) 
+       os.remove(mp4file) 
+
   elif CallbackQuery.data == "spd2":
     spdratevid = 0.66666666666
     spdrateaud = 1.5
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILESPED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILESPED_MODE_BUTTONS))
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+      await CallbackQuery.edit_message_text("جار التسريع")
+      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
+      await bot.send_audio(user_id, mp3file) 
+      os.remove(file_path) 
+      os.remove(mp3file) 
+    elif (ex == ".mp4" or ex == ".mkv") :
+       await CallbackQuery.edit_message_text("جار التسريع")
+       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
+       await  bot.send_video(user_id,mp4file)
+       os.remove(file_path) 
+       os.remove(mp4file) 
   elif CallbackQuery.data == "spd3":
     spdratevid = 0.57142857142
     spdrateaud = 1.75
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILESPED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILESPED_MODE_BUTTONS))
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+      await CallbackQuery.edit_message_text("جار التسريع")
+      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
+      await bot.send_audio(user_id, mp3file) 
+      os.remove(file_path) 
+      os.remove(mp3file) 
+    elif (ex == ".mp4" or ex == ".mkv") :
+       await CallbackQuery.edit_message_text("جار التسريع")
+       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
+       await  bot.send_video(user_id,mp4file)
+       os.remove(file_path) 
+       os.remove(mp4file) 
   elif CallbackQuery.data == "spd4":
     spdratevid = 0.5
     spdrateaud = 2
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILESPED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILESPED_MODE_BUTTONS))
-  elif CallbackQuery.data == "speedfileaud":
-    await CallbackQuery.edit_message_text("جار التسريع")
-    cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
-    await bot.send_audio(user_id, mp3file) 
-    os.remove(file_path) 
-    os.remove(mp3file) 
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+      await CallbackQuery.edit_message_text("جار التسريع")
+      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
+      await bot.send_audio(user_id, mp3file) 
+      os.remove(file_path) 
+      os.remove(mp3file) 
+    elif (ex == ".mp4" or ex == ".mkv") :
+       await CallbackQuery.edit_message_text("جار التسريع")
+       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
+       await  bot.send_video(user_id,mp4file)
+       os.remove(file_path) 
+       os.remove(mp4file) 
   
-  
-  elif CallbackQuery.data == "speedfilevid":
-    await CallbackQuery.edit_message_text("جار التسريع")
-    cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
-    await  bot.send_video(user_id,mp4file)
-    os.remove(file_path) 
-    os.remove(mp4file) 
 
   elif CallbackQuery.data == "audmerge":
     await CallbackQuery.edit_message_text("جار الإضافة ")
@@ -945,10 +987,21 @@ async def _telegram_file(client, message):
         vidsrt.clear()
 
   elif CallbackQuery.data == "normaltrim" :
-         await CallbackQuery.edit_message_text(text = CHOOSE_UR_FILETRIM_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILETRIM_MODE_BUTTONS))
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+       await CallbackQuery.edit_message_text("جار القص")  
+       cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "trim{mp3file}" -y ''')
+       cmd(f'''ffmpeg -i "trim{mp3file}" -ss {strt_point} -to {end_point} -c copy "{mp3file}" -y ''')
+       await  bot.send_audio(user_id, mp3file)
+       os.remove(file_path) 
+       os.remove(mp3file) 
+       os.remove(f"trim{mp3file}")
+    elif (ex == ".mp4" or ex == ".mkv") :
+      await CallbackQuery.edit_message_text("جار القص")  
+      cmd(f'''ffmpeg -i "{file_path}" -ss {strt_point} -strict -2 -to {end_point} -c:a aac -codec:v h264 -b:v 1000k "{mp4file}" -y ''')
+      await bot.send_video(user_id, mp4file)   
+      os.remove(file_path) 
+      os.remove(mp4file) 
   elif CallbackQuery.data == "reversetrim" :
-         await CallbackQuery.edit_message_text(text = CHOOSE_UR_RTRIMFILE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_RTRIMFILE_MODE_BUTTONS))
-  elif CallbackQuery.data == "rtrimaud" :
      starsec = re.split(':',strt_point)
      if len(starsec) == 3 :
         strtseconds = int(starsec[0])*60*60 + int(starsec[1])*60 + int(starsec[2])
@@ -1107,6 +1160,19 @@ async def refunc(client,message):
           global newfile
           newfile = f"{newname}{ex}"
           os.rename(file_path,newfile)
-          await message.reply(text = CHOOSE_UR_FILERENM_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FILERENM_MODE_BUTTONS))
+          if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+            await bot.send_audio(user_id,newfile)
+          elif (ex == ".mp4" or ex == ".mkv") :
+            await bot.send_video(user_id,newfile)
+          elif (ex == ".jpg" or ex == ".png") :
+            await bot.send_photo(user_id,newfile)
+          else : 
+             await bot.send_document(user_id,newfile)
+          os.remove(newfile)
+
+
+
+
+
         
 bot.run()
