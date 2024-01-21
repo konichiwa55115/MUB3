@@ -69,19 +69,24 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("كتم صوت الفيديو",callback_data="mute")],
     [InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp")],
     [InlineKeyboardButton("دمج الترجمة مع الفيديو",callback_data="vidsrt"),InlineKeyboardButton("دمج الفيديو",callback_data="vidmerge")],
+    [InlineKeyboardButton("ضغط الفيديو",callback_data="vidcomp")],
     [InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("OCR صور",callback_data="OCR")],
     [InlineKeyboardButton("تفريغ pdf",callback_data="pdfOCR"),InlineKeyboardButton("ضغط pdf",callback_data="pdfcompress")],
     [InlineKeyboardButton("دمج pdf",callback_data="pdfmerge"),InlineKeyboardButton("قص pdf ",callback_data="pdftrim")],
     [InlineKeyboardButton("صور إلى pdf",callback_data="imagetopdf"), InlineKeyboardButton("عكس pdf",callback_data="reversepdf")],
     [InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines"),InlineKeyboardButton("titled",callback_data="titled")],
     [InlineKeyboardButton("ترقيع الصور",callback_data="imagestitch"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif")],
-    [InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")]
+    [InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("ضغط الملفات إلى أرشيف",callback_data="zipfile")]
    
 ]
 
 PRESS_MERGE_IMAGE = "الآن أرسل الصورة الأخرى و اختر دمج الآن "
 PRESS_MERGE_IMAGE_BUTTONS = [
     [InlineKeyboardButton("دمج الآن ",callback_data="imagemergenow")]
+     ]
+PRESS_ZIP_FILE = "بعد الانتهاء من إرسال الملفات , اضغط تحويل الآن "
+PRESS_ZIP_FILE_BUTTONS = [
+    [InlineKeyboardButton("تحويل الآن",callback_data="zipnow")]
      ]
 CHOOSE_UR_VIDMERGE_MODE = "الآن أرسل الفيديوهات الأخرى و اختر دمج الآن "
 CHOOSE_UR_VIDMERGE_MODE_BUTTONS= [
@@ -1074,6 +1079,28 @@ async def _telegram_file(client, message):
     shutil.rmtree("./rvtemp/")
     imagepdfdic.clear()
     rpdfpage.clear()
+  elif  CallbackQuery.data == "zipfile" :
+    cmd('mkdir zipdir')
+    mergeviditem = f"./zipdir/{filename}"
+    os.rename(file_path,mergeviditem)
+    await CallbackQuery.edit_message_text(text =PRESS_ZIP_FILE,reply_markup = InlineKeyboardMarkup(PRESS_ZIP_FILE_BUTTONS))
+  elif  CallbackQuery.data == "zipnow" :
+    zipfile = f"{nom}.zip"
+    shutil.make_archive(nom, 'zip', './zipdir/')
+    await bot.send_document(user_id,zipfile)
+    os.remove(zipfile)
+    shutil.rmtree("./zipdir/")
+  elif  CallbackQuery.data == "vidcomp" :
+    #cmd(f'''ffmpeg -i "{file_path}" -vcodec libx265 -crf 28 "{mp4file}"''')
+    cmd(f'''ffmpeg -y -i "{file_path}" -vf "setpts=1*PTS" -r 10 "{mp4file}"''')
+    await bot.send_video(user_id,mp4file)
+    os.remove(mp4file)
+    os.remove(file_path)
+
+
+
+
+
 
 
 
