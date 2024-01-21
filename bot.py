@@ -1027,17 +1027,19 @@ async def _telegram_file(client, message):
      vidmergelist.append(mergeviditem)
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
   elif  CallbackQuery.data == "vidmergenow" :
-     if len(vidmergelist) == 2 : 
-        cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "{mp4file}"''') 
-        pass
-     else :
-        await CallbackQuery.edit_message_text("البوت يدعم دمج فيدوين فقط ")
-        shutil.rmtree("./data/")
- 
+     for x in range(1,len(vidmergelist)):
+        cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "mod.mp4"''') 
+        os.rename("mod.mp4",mp4file)
+        if len(vidmergelist) > 2:
+         vidmergelist.remove(vidmergelist[0])
+         vidmergelist.remove(vidmergelist[0])
+         vidmergelist.insert(0,mp4file)
+
      await bot.send_video(user_id,mp4file)
      shutil.rmtree("./data/")
      os.remove(mp4file)
      vidmergelist.clear()
+        
   elif  CallbackQuery.data == "reversepdf" :
     await CallbackQuery.edit_message_text("جار العكس")
     cmd('mkdir rvtemp')
