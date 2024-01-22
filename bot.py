@@ -1096,7 +1096,8 @@ async def _telegram_file(client, message):
   elif  CallbackQuery.data == "unzip" :
     unzippath = "./unzipprocess/"
     cmd(f'mkdir "{unzippath}"')
-    with ZipFile(file_path, 'r') as zObject: 
+    if ex == ".zip":
+     with ZipFile(file_path, 'r') as zObject: 
       zObject.extractall(path=unzippath) 
     files = os.listdir(unzippath)
     for x in range(0,len(files)):
