@@ -62,18 +62,14 @@ def merge_images2(file1, file2):
 CHOOSE_UR_AUDIO_MODE = "اختر العملية  التي تريد "
 CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     
-    [InlineKeyboardButton("تضخيم صوتية / فيديو ",callback_data="amplifyaud"),InlineKeyboardButton("قص صوتية / فيديو ",callback_data="trim")],
-    [InlineKeyboardButton("تسريع صوتية / فيديو ",callback_data="speedy"),InlineKeyboardButton("تحويل صوتية / فيديو ",callback_data="conv")], 
-    [InlineKeyboardButton("دمج الترجمة مع الفيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp")],
-    [InlineKeyboardButton("ضغط الملفات إلى أرشيف",callback_data="zipfile"),InlineKeyboardButton("فك ضغط الملف",callback_data="unzip")],
-    [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"), InlineKeyboardButton("ضغط الصوتية ",callback_data="comp"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
-    [InlineKeyboardButton("دمج صوتيات ",callback_data="audmerge"),InlineKeyboardButton("تفريغ صوتية",callback_data="transcribe"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
-    [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("كتم صوت الفيديو",callback_data="mute"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
-    [InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("دمج الفيديو",callback_data="vidmerge"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
-    [InlineKeyboardButton("ضغط الفيديو",callback_data="vidcomp"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("OCR صور",callback_data="OCR")],
-    [InlineKeyboardButton("تفريغ pdf",callback_data="pdfOCR"),InlineKeyboardButton("ضغط pdf",callback_data="pdfcompress"),InlineKeyboardButton("دمج pdf",callback_data="pdfmerge")],
-    [InlineKeyboardButton("قص pdf ",callback_data="pdftrim"),InlineKeyboardButton("صور إلى pdf",callback_data="imagetopdf"), InlineKeyboardButton("عكس pdf",callback_data="reversepdf")],
-    [InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines"),InlineKeyboardButton("titled",callback_data="titled"),InlineKeyboardButton("ترقيع الصور",callback_data="imagestitch")]
+    [InlineKeyboardButton("تضخيم  ",callback_data="amplifyaud"),InlineKeyboardButton("قص ",callback_data="trim"),InlineKeyboardButton("ضغط ",callback_data="comp")],
+    [InlineKeyboardButton("تسريع ",callback_data="speedy"),InlineKeyboardButton("تحويل ",callback_data="conv"),InlineKeyboardButton("تفريغ ",callback_data="transcribe")], 
+    [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
+    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines")],
+    [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")],
+    [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("فك الضغط",callback_data="unzip"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
+    [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
+    [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
    
 ]
 
@@ -392,7 +388,23 @@ async def _telegram_file(client, message):
   if CallbackQuery.data == "amplifyaud":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_AMPLE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AMPLE_MODE_BUTTONS))
   elif CallbackQuery.data == "comp":
-   await CallbackQuery.edit_message_text(text = CHOOSE_UR_COMP_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_COMP_MODE_BUTTONS) )
+   if ex == ".pdf":
+      await CallbackQuery.edit_message_text("جار الضغط")
+      PDFNet.Initialize("demo:1676040759361:7d2a298a03000000006027df7c81c9e05abce088e7286e8312e5e06886"); doc = PDFDoc(f"{file_path}")
+      doc.InitSecurityHandler()
+      Optimizer.Optimize(doc)
+      doc.Save(f"{filename}", SDFDoc.e_linearized)
+      doc.Close()
+      await bot.send_document(user_id, filename)
+      os.remove(file_path) 
+      os.remove(filename) 
+   elif ex == ".mkv" or ex == ".mp4":
+    cmd(f'''ffmpeg -y -i "{file_path}" -vf "setpts=1*PTS" -r 10 "{mp4file}"''')
+    await bot.send_video(user_id,mp4file)
+    os.remove(mp4file)
+    os.remove(file_path)
+   elif ex == ".mp3" or ex == ".m4a" or ex == ".ogg":
+    await CallbackQuery.edit_message_text(text = CHOOSE_UR_COMP_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_COMP_MODE_BUTTONS) )
   elif  CallbackQuery.data == "compmod1":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     cmd(f''' ffmpeg -i "{file_path}" -b:a 10k "{mp3file}" -y ''' )
@@ -511,7 +523,16 @@ async def _telegram_file(client, message):
     os.remove(mp3file) 
 
   elif CallbackQuery.data == "conv" :
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
+    if ex == ".jpg" or ex == ".png" :
+      imagepdfdic1.append(file_path)
+      global imagey
+      imagey = Image.open(imagepdfdic1[0]).convert('RGB')
+      if len(imagepdfdic1) > 1 :
+       image2 = Image.open(file_path).convert('RGB')
+       imagepdfdic.append(image2)
+      await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
+    else :
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
   elif CallbackQuery.data == "audconv" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
    cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
@@ -533,8 +554,12 @@ async def _telegram_file(client, message):
    os.remove(mp4file) 
 
   elif CallbackQuery.data == "trim" :
-   await nepho.reply_text("الآن أرسل نقطة البداية والنهاية بهذه الصورة \n\n hh:mm:ss/hh:mm:ss",reply_markup=ForceReply(True))
-   await CallbackQuery.edit_message_text("👇") 
+    if ex == ".pdf":
+      await CallbackQuery.edit_message_text("👇")
+      await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
+    else :
+      await nepho.reply_text("الآن أرسل نقطة البداية والنهاية بهذه الصورة \n\n hh:mm:ss/hh:mm:ss",reply_markup=ForceReply(True))
+      await CallbackQuery.edit_message_text("👇") 
   elif CallbackQuery.data == "mod1":
       amplemode = 5
       await CallbackQuery.edit_message_text("جار التضخيم ")
@@ -613,6 +638,7 @@ async def _telegram_file(client, message):
     await nepho.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
   
   elif CallbackQuery.data == "transcribe":
+   if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" or ex == ".mkv" or ex == ".mp4" :
     try: 
       with open('transcription.txt', 'r') as fh:
         if os.stat('transcription.txt').st_size == 0: 
@@ -631,6 +657,71 @@ async def _telegram_file(client, message):
     os.remove(file_path) 
     os.remove(mp3file) 
     os.remove(result) 
+   elif  ex == ".pdf":
+    try: 
+      with open('final.txt', 'r') as fh:
+        if os.stat('final.txt').st_size == 0: 
+            pass
+        else:
+            await CallbackQuery.edit_message_text("هناك تفريغ يتم الآن ") 
+            return
+    except FileNotFoundError: 
+     pass  
+    await CallbackQuery.edit_message_text("جار التفريغ")
+    cmd('mkdir temp')
+    pdf = pdfium.PdfDocument(f'{file_path}')
+    n_pages = len(pdf)
+    for page_number in range(n_pages):
+     page = pdf.get_page(page_number)
+     pil_image = page.render_topil(
+        scale=1,
+        rotation=0,
+        crop=(0, 0, 0, 0),
+        colour=(255, 255, 255, 255),
+        annotations=True,
+        greyscale=False,
+        optimise_mode=pdfium.OptimiseMode.NONE,
+    )
+     pil_image.save(f"./temp/image_{page_number+1}.png")
+    os.remove(file_path) 
+    count = 0
+    for path in os.listdir("./temp/"):
+                if os.path.isfile(os.path.join("./temp/", path)):
+                            count += 1
+                            numbofitems=count
+    coca=1
+    final = numbofitems 
+    while (coca < final): 
+     cmd(f'''sh textcleaner -g "./temp/image_{coca}.png" temp.png ''')
+     lang_code = "ara"
+     data_url = f"https://github.com/tesseract-ocr/tessdata/raw/main/{lang_code}.traineddata"
+     dirs = r"/usr/share/tesseract-ocr/4.00/tessdata"
+     path = os.path.join(dirs, f"{lang_code}.traineddata")
+     data = requests.get(data_url, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
+     open(path, 'wb').write(data.content)
+     text = pytesseract.image_to_string(f"temp.png" , lang=f"{lang_code}")
+     textspaced = re.sub(r'\r\n|\r|\n', ' ', text)
+     with open("final.txt",'a') as f:
+      f.write(f'''{textspaced} \n''')
+     coca +=1
+    os.rename("final.txt",result)
+    await bot.send_document(user_id, result)
+    shutil.rmtree('./temp/') 
+    os.remove(result)
+   elif  ex == ".jpg" or ex == ".png" :
+    await CallbackQuery.edit_message_text("جار التفريغ")
+    lang_code = "ara"
+    data_url = f"https://github.com/tesseract-ocr/tessdata/raw/main/{lang_code}.traineddata"
+    dirs = r"/usr/share/tesseract-ocr/4.00/tessdata"
+    path = os.path.join(dirs, f"{lang_code}.traineddata")
+    data = requests.get(data_url, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
+    open(path, 'wb').write(data.content)
+    text = pytesseract.image_to_string(file_path, lang=f"{lang_code}")
+    textspaced = re.sub(r'\r\n|\r|\n', ' ', text)
+    await nepho.reply(textspaced[:-1], quote=True, disable_web_page_preview=True)
+    os.remove(file_path) 
+
+
   elif CallbackQuery.data == "mute":
     await CallbackQuery.edit_message_text("جار الكتم")
     cmd(f'''ffmpeg -i "{file_path}" -c copy -an "{mp4file}"''')
@@ -706,9 +797,27 @@ async def _telegram_file(client, message):
   
 
   elif CallbackQuery.data == "audmerge":
-    await CallbackQuery.edit_message_text("جار الإضافة ")
-    audmergelist.append(file_path)
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
+    if ex == ".m4a" or ex == ".mp3" or ex == ".ogg":
+     await CallbackQuery.edit_message_text("جار الإضافة ")
+     audmergelist.append(file_path)
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
+    elif ex == ".mp4" or ex == ".mkv" : 
+     cmd('mkdir data')
+     mergeviditem = f"./data/{random.randint(1,100)}.mp4"
+     os.rename(file_path,mergeviditem)
+     vidmergelist.append(mergeviditem)
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
+    elif ex == ".jpg" or ex == ".png":
+     imagedic.append(file_path)
+     await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
+    elif ex == ".pdf":
+      pdfdir = f"pdfmerge/{filename}"
+      cmd("mkdir pdfmerge")
+      cmd(f'''mv "{file_path}" ./pdfmerge/''')
+      with open('pdfy.txt','a') as f:
+       f.write(f'''{pdfdir} \n''')  
+      await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
+
   elif CallbackQuery.data == "mergenow":
     await CallbackQuery.edit_message_text("جار الدمج") 
     cmd(f'''mkdir mergy''')
@@ -862,9 +971,9 @@ async def _telegram_file(client, message):
       cmd(f'''rm "{pdfmerged}" pdfy.txt''')
       os.remove(pdfmerged);os.remove("pdfy.txt")
 
-  elif CallbackQuery.data == "pdftrim":
-      await CallbackQuery.edit_message_text("👇")
-      await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
+  #elif CallbackQuery.data == "pdftrim":
+   #   await CallbackQuery.edit_message_text("👇")
+    #  await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
   elif CallbackQuery.data == "upldarch":
       if user_id==6234365091 :
          await CallbackQuery.edit_message_text("جار الرفع")
@@ -944,7 +1053,7 @@ async def _telegram_file(client, message):
       await nepho.reply_text("الآن أرسل مدة الفيديو بالثانية بهذه الصورة \n t=المدة",reply_markup=ForceReply(True))
   elif CallbackQuery.data == "imagetopdf" :
     imagepdfdic1.append(file_path)
-    global imagey
+    #global imagey
     imagey = Image.open(imagepdfdic1[0]).convert('RGB')
     if len(imagepdfdic1) > 1 :
      image2 = Image.open(file_path).convert('RGB')
