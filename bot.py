@@ -9,6 +9,7 @@ audmergelist = []
 vidmergelist = []
 temptxt = "res.txt"
 from pyrogram import Client, filters 
+from zipfile import ZipFile 
 import os ,re , random ,shutil,asyncio ,pytesseract,requests
 from os import system as cmd
 from pyrogram.types import InlineKeyboardMarkup , InlineKeyboardButton , ReplyKeyboardMarkup , CallbackQuery , ForceReply
@@ -63,20 +64,16 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     
     [InlineKeyboardButton("تضخيم صوتية / فيديو ",callback_data="amplifyaud"),InlineKeyboardButton("قص صوتية / فيديو ",callback_data="trim")],
     [InlineKeyboardButton("تسريع صوتية / فيديو ",callback_data="speedy"),InlineKeyboardButton("تحويل صوتية / فيديو ",callback_data="conv")], 
-    [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"), InlineKeyboardButton("ضغط الصوتية ",callback_data="comp")],
-    [InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("دمج صوتيات ",callback_data="audmerge")],
-    [InlineKeyboardButton("تفريغ صوتية",callback_data="transcribe"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
-    [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("كتم صوت الفيديو",callback_data="mute")],
-    [InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp")],
-    [InlineKeyboardButton("دمج الترجمة مع الفيديو",callback_data="vidsrt"),InlineKeyboardButton("دمج الفيديو",callback_data="vidmerge")],
-    [InlineKeyboardButton("ضغط الفيديو",callback_data="vidcomp")],
-    [InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("OCR صور",callback_data="OCR")],
-    [InlineKeyboardButton("تفريغ pdf",callback_data="pdfOCR"),InlineKeyboardButton("ضغط pdf",callback_data="pdfcompress")],
-    [InlineKeyboardButton("دمج pdf",callback_data="pdfmerge"),InlineKeyboardButton("قص pdf ",callback_data="pdftrim")],
-    [InlineKeyboardButton("صور إلى pdf",callback_data="imagetopdf"), InlineKeyboardButton("عكس pdf",callback_data="reversepdf")],
-    [InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines"),InlineKeyboardButton("titled",callback_data="titled")],
-    [InlineKeyboardButton("ترقيع الصور",callback_data="imagestitch"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif")],
-    [InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("ضغط الملفات إلى أرشيف",callback_data="zipfile")]
+    [InlineKeyboardButton("دمج الترجمة مع الفيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp")],
+    [InlineKeyboardButton("ضغط الملفات إلى أرشيف",callback_data="zipfile"),InlineKeyboardButton("فك ضغط الملف",callback_data="unzip")],
+    [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"), InlineKeyboardButton("ضغط الصوتية ",callback_data="comp"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
+    [InlineKeyboardButton("دمج صوتيات ",callback_data="audmerge"),InlineKeyboardButton("تفريغ صوتية",callback_data="transcribe"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
+    [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("كتم صوت الفيديو",callback_data="mute"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
+    [InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("دمج الفيديو",callback_data="vidmerge"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
+    [InlineKeyboardButton("ضغط الفيديو",callback_data="vidcomp"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("OCR صور",callback_data="OCR")],
+    [InlineKeyboardButton("تفريغ pdf",callback_data="pdfOCR"),InlineKeyboardButton("ضغط pdf",callback_data="pdfcompress"),InlineKeyboardButton("دمج pdf",callback_data="pdfmerge")],
+    [InlineKeyboardButton("قص pdf ",callback_data="pdftrim"),InlineKeyboardButton("صور إلى pdf",callback_data="imagetopdf"), InlineKeyboardButton("عكس pdf",callback_data="reversepdf")],
+    [InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines"),InlineKeyboardButton("titled",callback_data="titled"),InlineKeyboardButton("ترقيع الصور",callback_data="imagestitch")]
    
 ]
 
@@ -1096,6 +1093,32 @@ async def _telegram_file(client, message):
     await bot.send_video(user_id,mp4file)
     os.remove(mp4file)
     os.remove(file_path)
+  elif  CallbackQuery.data == "unzip" :
+    unzippath = "./unzipprocess/"
+    cmd(f'mkdir "{unzippath}"')
+    with ZipFile(file_path, 'r') as zObject: 
+      zObject.extractall(path=unzippath) 
+    files = os.listdir(unzippath)
+    for x in range(0,len(files)):
+      sentfile = f"{unzippath}{files[x]}"
+      tempnom,tempex = os.path.splitext(files[x])
+      itsextension = tempex
+      if itsextension == ".mp3" or itsextension == ".m4a" or itsextension == ".ogg":
+        await bot.send_audio(user_id,sentfile)
+      elif itsextension == ".mp4" or itsextension == ".mkv" :
+        await bot.send_video(user_id,sentfile)
+      elif itsextension == ".jpg" or itsextension == ".png" :
+        await bot.send_photo(user_id,sentfile)
+      else :
+          await bot.send_document(user_id,sentfile)
+    shutil.rmtree(unzippath)  
+
+
+      
+
+
+
+
 
 
 
