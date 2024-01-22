@@ -67,7 +67,7 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
     [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines")],
     [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")],
-    [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("فك الضغط",callback_data="unzip"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
+    [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
     [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
     [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
    
@@ -1203,13 +1203,13 @@ async def _telegram_file(client, message):
     os.remove(mp4file)
     os.remove(file_path)
   elif  CallbackQuery.data == "unzip" :
-    unzippath = "./unzipprocess/"
-    cmd(f'mkdir "{unzippath}"')
-    if ex == ".zip":
+   unzippath = "./unzipprocess/"
+   cmd(f'mkdir "{unzippath}"')
+   if ex == ".zip":
      with ZipFile(file_path, 'r') as zObject: 
       zObject.extractall(path=unzippath) 
-    files = os.listdir(unzippath)
-    for x in range(0,len(files)):
+     files = os.listdir(unzippath)
+     for x in range(0,len(files)):
       sentfile = f"{unzippath}{files[x]}"
       tempnom,tempex = os.path.splitext(files[x])
       itsextension = tempex
@@ -1221,7 +1221,30 @@ async def _telegram_file(client, message):
         await bot.send_photo(user_id,sentfile)
       else :
           await bot.send_document(user_id,sentfile)
-    shutil.rmtree(unzippath)  
+     shutil.rmtree(unzippath)  
+   elif ex == ".pdf":
+    pdf = pdfium.PdfDocument(f'{file_path}')
+    n_pages = len(pdf)
+    for page_number in range(n_pages):
+     page = pdf.get_page(page_number)
+     pil_image = page.render_topil(
+        scale=1,
+        rotation=0,
+        crop=(0, 0, 0, 0),
+        colour=(255, 255, 255, 255),
+        annotations=True,
+        greyscale=False,
+        optimise_mode=pdfium.OptimiseMode.NONE,
+    )
+     pil_image.save(f"{unzippath}image_{page_number+1}.png")
+    os.remove(file_path) 
+    images = os.listdir(unzippath)
+    for x in range(0,len(images)):
+      sentfile = f"{unzippath}{images[x]}"
+      await bot.send_document(user_id,sentfile)
+    shutil.rmtree(unzippath)
+
+
 
 
       
