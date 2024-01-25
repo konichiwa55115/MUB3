@@ -35,16 +35,17 @@ bot = Client(
 #6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
 def merge_images1(file1, file2):
-    
     image1 = Image.open(file1)
     image2 = Image.open(file2)
     (width1, height1) = image1.size
     (width2, height2) = image2.size
-    result_width = max(width1 , width2)
+    result_width = max(width1,width2)
     result_height = height1 + height2
     result = Image.new('RGB', (result_width, result_height))
-    result.paste(im=image1, box=(0, 0))
-    result.paste(im=image2, box=(0, height1))
+    iso1 = image1.resize((result_width,height1))
+    iso2 = image2.resize((result_width,height2))
+    result.paste(iso1, box=(0, 0))
+    result.paste(iso2, box=(0, height1))
     return result
 def merge_images2(file1, file2):
     image1 = Image.open(file1)
@@ -54,8 +55,10 @@ def merge_images2(file1, file2):
     result_width = width1 + width2
     result_height = max(height1, height2)
     result = Image.new('RGB', (result_width, result_height))
-    result.paste(im=image1, box=(0, 0))
-    result.paste(im=image2, box=(width1, 0))
+    iso1 = image1.resize((width1,result_height))
+    iso2 = image2.resize((width2,result_height))
+    result.paste(im=iso1, box=(0, 0))
+    result.paste(im=iso2, box=(width1, 0))
     return result
 
 
@@ -68,7 +71,7 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines")],
     [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")],
     [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
-    [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير أبعاد الفيديو ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
+    [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير الأبعاد  ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
     [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
    
 ]
@@ -992,7 +995,11 @@ async def _telegram_file(client, message):
       os.remove(file_path)
       os.remove(filename)
   elif CallbackQuery.data == "vidasp":
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
+    if ex == ".mp4" or ex == ".mkv":
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
+    elif ex == ".png" or ex == ".jpg":
+      await nepho.reply_text("الآن أدخل أبعاد الصورة الجديدة بهذه الصورة \n lenght:width ",reply_markup=ForceReply(True))
+
   elif CallbackQuery.data == "vidresnow11":
     await  CallbackQuery.edit_message_text("جار التحويل")
     cmd(f'''ffmpeg -i "{file_path}" -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=black" "{mp4file}"''')
@@ -1245,41 +1252,26 @@ async def _telegram_file(client, message):
     shutil.rmtree(unzippath)
 
 
-
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-     
-     
-
-     
-
-
      
   queeq.clear()
-
-
-     
-
-
-
-
+@bot.on_message(filters.private & filters.reply & filters.regex(":"))
+async def refunc(client,message):
+   if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
+          lenghtwidth = message.text 
+          msgid = message.reply_to_message_id
+          await bot.delete_messages(user_id,msgid)
+          await message.delete()
+          lenghtwidthlist = re.split(':',lenghtwidth)
+          img = Image.open(file_path)
+          height = int(img.size[0])
+          newheight=int(lenghtwidthlist[1]) * height
+          width = img.size[1] 
+          newwidth = int(lenghtwidthlist[0]) * width
+          new_image = image.resize((newwidth, newheight))
+          new_image.save(filename)
+          await bot.send_photo(user_id,filename)
+          os.remove(filename)
+          os.remove(file_path)
 
      
 @bot.on_message(filters.private & filters.reply & filters.regex("="))
