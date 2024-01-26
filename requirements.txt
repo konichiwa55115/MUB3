@@ -19,5 +19,6 @@ pypdf
 PDFNetPython3
 PyPDF2
 yt-dlp
+youtube-transcript-api
 
 
