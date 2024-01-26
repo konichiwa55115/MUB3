@@ -55,10 +55,8 @@ def merge_images2(file1, file2):
     result_width = width1 + width2
     result_height = max(height1, height2)
     result = Image.new('RGB', (result_width, result_height))
-    iso1 = image1.resize((width1,result_height))
-    iso2 = image2.resize((width2,result_height))
-    result.paste(im=iso1, box=(0, 0))
-    result.paste(im=iso2, box=(width1, 0))
+    result.paste(im=image1, box=(0, 0))
+    result.paste(im=image2, box=(width1, 0))
     return result
 
 
@@ -419,10 +417,17 @@ async def _telegram_file(client, message):
       await bot.send_document(user_id, filename)
       await CallbackQuery.edit_message_text("تم الإرسال  ") 
       os.remove(filename)
-  elif  CallbackQuery.data == "voicy":   
+  elif  CallbackQuery.data == "voicy":  
     await CallbackQuery.edit_message_text("جار تغيير الصوت ") 
-    cmd(f'''ffmpeg -i "{file_path}" -af asetrate=44100*0.9,aresample=44100,atempo=1/0.9 "{mp3file}"''')
-    await bot.send_audio(user_id, mp3file)
+    if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" :
+     cmd(f'''ffmpeg -i "{file_path}" -af asetrate=44100*0.75,aresample=44100,atempo=4/3 "{mp3file}"''')
+     await bot.send_audio(user_id, mp3file)
+    elif ex == ".mp4" or ex == ".mkv" :
+       cmd(f'''ffmpeg -i "{file_path}" -af asetrate=44100*0.75,aresample=44100,atempo=4/3 "{mp3file}"''')
+       cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
+       await bot.send_video(user_id,mp4file)
+       os.remove(mp4file)
+
     os.remove(file_path) 
     os.remove(mp3file) 
  
