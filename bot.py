@@ -12,6 +12,7 @@ from pyrogram import Client, filters
 from zipfile import ZipFile 
 import os ,re , random ,shutil,asyncio ,pytesseract,requests
 from os import system as cmd
+from youtube_transcript_api import YouTubeTranscriptApi
 from pyrogram.types import InlineKeyboardMarkup , InlineKeyboardButton , ReplyKeyboardMarkup , CallbackQuery , ForceReply
 import pypdfium2 as pdfium
 from yt_dlp import YoutubeDL
@@ -65,12 +66,13 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     
     [InlineKeyboardButton("تضخيم  ",callback_data="amplifyaud"),InlineKeyboardButton("قص ",callback_data="trim"),InlineKeyboardButton("ضغط ",callback_data="comp")],
     [InlineKeyboardButton("تسريع ",callback_data="speedy"),InlineKeyboardButton("تحويل ",callback_data="conv"),InlineKeyboardButton("تفريغ ",callback_data="transcribe")], 
-    [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
-    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("أزلة أسطر txt",callback_data="rmvlines")],
-    [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")],
-    [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty")],
+    [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm")],
+    [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
+    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
+    [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip")],
     [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير الأبعاد  ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
-    [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch")],
+    [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")]
+    
    
 ]
 
@@ -197,6 +199,25 @@ def command9(bot,message):
   bucketname = message.text.split("setbucket", maxsplit=1)[1]
   bucketname = bucketname.replace(" ", "")
   message.reply_text("تم ضبط المعرف ")
+
+@bot.on_message(filters.command('ytsub') & filters.text & filters.private)
+def command20(bot,message):
+     dlmode = message.text.split(" ")[-1] 
+     ytlink = message.text.split("ytsub", maxsplit=1)[1].replace(" ", "")
+     yt_id = message.from_user.id
+     with YoutubeDL() as ydl: 
+        info_dict = ydl.extract_info(f'{ytlink}', download=False)
+        video_url = info_dict.get("url", None)
+        video_id = info_dict.get("id", None)
+        video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
+        subfile = f"{video_title}.txt"
+     srt = YouTubeTranscriptApi.get_transcript(video_id,languages=['ar'])
+     with open(subfile, "w") as f:
+            for i in srt:
+             f.write(f" {i['text']} ")
+     bot.send_document(yt_id,subfile)
+     os.remove(subfile)
+        
 
 @bot.on_message(filters.command('ytdl') & filters.text & filters.private)
 def command20(bot,message):
