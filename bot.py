@@ -7,6 +7,7 @@ imagepdfdic1 = []
 vidsrt = []
 audmergelist = []
 vidmergelist = []
+queeq = []   
 temptxt = "res.txt"
 from pyrogram import Client, filters 
 from zipfile import ZipFile 
@@ -104,13 +105,7 @@ PRESS_MERGEMODE_IMAGE_BUTTONS = [
     [InlineKeyboardButton("الأولى فوق والثانية تحت ",callback_data="updown")]
 
      ]
-CHOOSE_UR_DL_MODE = "اختر نمط التنزيل "
-CHOOSE_UR_DL_MODE_BUTTONS = [
-    [InlineKeyboardButton("VIDEO 360P",callback_data="vid360")],
-    [InlineKeyboardButton("VIDEO 720P ",callback_data="vid720")],
-    [InlineKeyboardButton("AUDIO",callback_data="auddl")],
-    
-]
+
 CHOOSE_UR_AMPLE_MODE = "اختر نمط التضخيم "
 CHOOSE_UR_AMPLE_MODE_BUTTONS = [
     [InlineKeyboardButton("5db",callback_data="mod1")],
@@ -138,31 +133,7 @@ CHOOSE_UR_COMP_MODE_BUTTONS = [
      [InlineKeyboardButton("50k",callback_data="compmod5")]
 ]
 
-CHOOSE_UR_FILE_MODE = "اختر نوع ملفك "
-CHOOSE_UR_FILE_MODE_BUTTONS = [
-    [InlineKeyboardButton("صوتية",callback_data="aud")],
-     [InlineKeyboardButton("فيديو ",callback_data="vid")]
-]
 
-CHOOSE_UR_YTPLST_MODE = "اختر نمط التحميل "
-CHOOSE_UR_YTPLST_MODE_BUTTONS = [
-    [InlineKeyboardButton("VID 360",callback_data="ytplstvid360")],
-     [InlineKeyboardButton("VID 720 ",callback_data="ytplstvid720")],
-      [InlineKeyboardButton("AUD ",callback_data="ytplstaud")]
-
-]
-
-CHOOSE_UR_FILETRIM_MODE = "اختر نوع ملفك "
-CHOOSE_UR_FILETRIM_MODE_BUTTONS = [
-    [InlineKeyboardButton("صوتية",callback_data="audtrim")],
-     [InlineKeyboardButton("فيديو ",callback_data="vidtrim")]
-     ]
-
-CHOOSE_UR_FILESPED_MODE = "اختر نوع ملفك "
-CHOOSE_UR_FILESPED_MODE_BUTTONS = [
-    [InlineKeyboardButton("صوتية",callback_data="speedfileaud")],
-     [InlineKeyboardButton("فيديو ",callback_data="speedfilevid")]
-]
 
 CHOOSE_UR_SPEED_MODE = "اختر نمط التسريع "
 CHOOSE_UR_SPEED_MODE_BUTTONS = [
@@ -185,9 +156,7 @@ CHOOSE_UR_CONV_MODE_BUTTONS = [
      [InlineKeyboardButton("تحويل صوتية/ فيديو إلى m4a",callback_data="audconvm4a")],
     [InlineKeyboardButton("تحويل فيديو إلى mp4 ",callback_data="vidconv")]
 ]
-CHOOSE_UR_RESO_MODE = '''اختر ما يناسب'''
-CHOOSE_UR_RESO_MODE_BUTTONS = [
-    [InlineKeyboardButton("فيديو اعتيادي",callback_data="normalvideo")], [InlineKeyboardButton("YT Short",callback_data="ytshort")]]
+
 
 @bot.on_message(filters.command('start') & filters.private)
 def command1(bot,message):
@@ -375,7 +344,6 @@ def command2(bot,message):
     audmergelist.clear()
     vidmergelist.clear()
 
-queeq = []   
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
 async def _telegram_file(client, message):
  global user_id ,file_path,filename,nom,ex,mp4file,mp3file,m4afile,spdrateaud,mergdir,trimdir,result,nepho
@@ -433,11 +401,6 @@ async def _telegram_file(client, message):
     await bot.send_audio(user_id, mp3file)
     os.remove(file_path) 
     os.remove(mp3file) 
-  elif  CallbackQuery.data == "titled":
-      os.rename(file_path,filename)
-      await bot.send_document(user_id, filename)
-      await CallbackQuery.edit_message_text("تم الإرسال  ") 
-      os.remove(filename)
   elif  CallbackQuery.data == "voicy":  
     await CallbackQuery.edit_message_text("جار تغيير الصوت ") 
     if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" :
@@ -509,20 +472,6 @@ async def _telegram_file(client, message):
 
 
  
-  elif CallbackQuery.data == "normalvideo":
-      await CallbackQuery.edit_message_text("جار المنتجة ") 
-      cmd(f'''ffmpeg -i "{thisismontagaudio}" -q:a 0 -map a "./downloads/temp{mp3file}" -y ''')
-      cmd(f'''ffmpeg -r 1 -loop 1 -y -i  "./downloads/imagetovid.jpg" -i "./downloads/temp{mp3file}" -c:v libx264 -tune stillimage -c:a copy -shortest -vf scale=1920:1080 "{mp4file}"''')
-      await bot.send_video(user_id, mp4file)
-      os.remove(file_path) 
-      os.remove(mp4file) 
-  elif CallbackQuery.data == "ytshort":
-      await CallbackQuery.edit_message_text("جار المنتجة ") 
-      cmd(f'''ffmpeg -i "{thisismontagaudio}" -q:a 0 -map a "./downloads/temp{mp3file}" -y ''')
-      cmd(f'''ffmpeg -r 1 -loop 1 -y -i  "./downloads/imagetovid.jpg" -i "./downloads/temp{mp3file}" -c:v libx264 -tune stillimage -c:a copy -shortest -vf scale=1080:1920 "{mp4file}"''')
-      await bot.send_video(user_id, mp4file)
-      os.remove(file_path) 
-      os.remove(mp4file) 
   elif  CallbackQuery.data == "compmod2":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     cmd(f''' ffmpeg -i "{file_path}" -b:a 20k "{mp3file}" -y ''' )
@@ -903,86 +852,7 @@ async def _telegram_file(client, message):
     await shutil.rmtree('./parts/') 
     os.remove("mod.mp3") 
     os.remove(file_path) 
-  elif CallbackQuery.data == "OCR":
-    await CallbackQuery.edit_message_text("جار التفريغ")
-    lang_code = "ara"
-    data_url = f"https://github.com/tesseract-ocr/tessdata/raw/main/{lang_code}.traineddata"
-    dirs = r"/usr/share/tesseract-ocr/4.00/tessdata"
-    path = os.path.join(dirs, f"{lang_code}.traineddata")
-    data = requests.get(data_url, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
-    open(path, 'wb').write(data.content)
-    text = pytesseract.image_to_string(file_path, lang=f"{lang_code}")
-    textspaced = re.sub(r'\r\n|\r|\n', ' ', text)
-    await nepho.reply(textspaced[:-1], quote=True, disable_web_page_preview=True)
-    os.remove(file_path) 
-  elif CallbackQuery.data == "pdfOCR":
-    try: 
-      with open('final.txt', 'r') as fh:
-        if os.stat('final.txt').st_size == 0: 
-            pass
-        else:
-            await CallbackQuery.edit_message_text("هناك تفريغ يتم الآن ") 
-            return
-    except FileNotFoundError: 
-     pass  
-    await CallbackQuery.edit_message_text("جار التفريغ")
-    cmd('mkdir temp')
-    pdf = pdfium.PdfDocument(f'{file_path}')
-    n_pages = len(pdf)
-    for page_number in range(n_pages):
-     page = pdf.get_page(page_number)
-     pil_image = page.render_topil(
-        scale=1,
-        rotation=0,
-        crop=(0, 0, 0, 0),
-        colour=(255, 255, 255, 255),
-        annotations=True,
-        greyscale=False,
-        optimise_mode=pdfium.OptimiseMode.NONE,
-    )
-     pil_image.save(f"./temp/image_{page_number+1}.png")
-    os.remove(file_path) 
-    count = 0
-    for path in os.listdir("./temp/"):
-                if os.path.isfile(os.path.join("./temp/", path)):
-                            count += 1
-                            numbofitems=count
-    coca=1
-    final = numbofitems 
-    while (coca < final): 
-     cmd(f'''sh textcleaner -g "./temp/image_{coca}.png" temp.png ''')
-     lang_code = "ara"
-     data_url = f"https://github.com/tesseract-ocr/tessdata/raw/main/{lang_code}.traineddata"
-     dirs = r"/usr/share/tesseract-ocr/4.00/tessdata"
-     path = os.path.join(dirs, f"{lang_code}.traineddata")
-     data = requests.get(data_url, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
-     open(path, 'wb').write(data.content)
-     text = pytesseract.image_to_string(f"temp.png" , lang=f"{lang_code}")
-     textspaced = re.sub(r'\r\n|\r|\n', ' ', text)
-     with open("final.txt",'a') as f:
-      f.write(f'''{textspaced} \n''')
-     coca +=1
-    os.rename("final.txt",result)
-    await bot.send_document(user_id, result)
-    shutil.rmtree('./temp/') 
-    os.remove(result)
-  elif CallbackQuery.data == "pdfcompress":
-      await CallbackQuery.edit_message_text("جار الضغط")
-      PDFNet.Initialize("demo:1676040759361:7d2a298a03000000006027df7c81c9e05abce088e7286e8312e5e06886"); doc = PDFDoc(f"{file_path}")
-      doc.InitSecurityHandler()
-      Optimizer.Optimize(doc)
-      doc.Save(f"{filename}", SDFDoc.e_linearized)
-      doc.Close()
-      await bot.send_document(user_id, filename)
-      os.remove(file_path) 
-      os.remove(filename) 
-  elif CallbackQuery.data == "pdfmerge":
-      pdfdir = f"pdfmerge/{filename}"
-      cmd("mkdir pdfmerge")
-      cmd(f'''mv "{file_path}" ./pdfmerge/''')
-      with open('pdfy.txt','a') as f:
-       f.write(f'''{pdfdir} \n''')  
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
+  
   elif CallbackQuery.data == "pdfmergenow":
       await CallbackQuery.edit_message_text("جار الدمج")
       pdfs = []
@@ -1000,9 +870,7 @@ async def _telegram_file(client, message):
       cmd(f'''rm "{pdfmerged}" pdfy.txt''')
       os.remove(pdfmerged);os.remove("pdfy.txt")
 
-  #elif CallbackQuery.data == "pdftrim":
-   #   await CallbackQuery.edit_message_text("👇")
-    #  await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
+  
   elif CallbackQuery.data == "upldarch":
       if user_id==6234365091 :
          await CallbackQuery.edit_message_text("جار الرفع")
@@ -1011,15 +879,7 @@ async def _telegram_file(client, message):
          await CallbackQuery.edit_message_text("تم الرفع")
       else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
-  elif CallbackQuery.data == "rmvlines":
-      await CallbackQuery.edit_message_text("جار العمل")
-      with open(file_path, 'r') as file:
-           text = file.read().replace("\n", " ")
-      with open(filename,'a') as f:
-       f.write(text)
-      await bot.send_document(user_id,filename) 
-      os.remove(file_path)
-      os.remove(filename)
+  
   elif CallbackQuery.data == "vidasp":
     if ex == ".mp4" or ex == ".mkv":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
@@ -1040,9 +900,7 @@ async def _telegram_file(client, message):
    await bot.send_audio(user_id,mp3file)
    os.remove(file_path)
    os.remove(mp3file)
-  elif CallbackQuery.data == "imagestitch" :
-     imagedic.append(file_path)
-     await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
+ 
   elif CallbackQuery.data == "imagemergenow" :
           await CallbackQuery.edit_message_text(text = PRESS_MERGEMODE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGEMODE_IMAGE_BUTTONS))
   elif CallbackQuery.data == "sidebyside" :
@@ -1084,14 +942,7 @@ async def _telegram_file(client, message):
      os.remove(output_img)
   elif CallbackQuery.data == "imagetogif" :
       await nepho.reply_text("الآن أرسل مدة الفيديو بالثانية بهذه الصورة \n t=المدة",reply_markup=ForceReply(True))
-  elif CallbackQuery.data == "imagetopdf" :
-    imagepdfdic1.append(file_path)
-    #global imagey
-    imagey = Image.open(imagepdfdic1[0]).convert('RGB')
-    if len(imagepdfdic1) > 1 :
-     image2 = Image.open(file_path).convert('RGB')
-     imagepdfdic.append(image2)
-    await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
+  
   elif CallbackQuery.data == "convnow" :
     pdffile = f"{nom}.pdf"
     imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
@@ -1164,12 +1015,7 @@ async def _telegram_file(client, message):
      await bot.send_audio(user_id,mp3file)
      os.remove(mp3file)
      os.remove(file_path)
-  elif  CallbackQuery.data == "vidmerge" :
-     cmd('mkdir data')
-     mergeviditem = f"./data/{random.randint(1,100)}.mp4"
-     os.rename(file_path,mergeviditem)
-     vidmergelist.append(mergeviditem)
-     await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
+  
   elif  CallbackQuery.data == "vidmergenow" :
      for x in range(1,len(vidmergelist)):
         cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "mod.mp4"''') 
@@ -1280,26 +1126,7 @@ async def _telegram_file(client, message):
 
      
   queeq.clear()
-@bot.on_message(filters.private & filters.reply & filters.regex(":"))
-async def refunc(client,message):
-   if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
-          lenghtwidth = message.text 
-          msgid = message.reply_to_message_id
-          await bot.delete_messages(user_id,msgid)
-          await message.delete()
-          lenghtwidthlist = re.split(':',lenghtwidth)
-          img = Image.open(file_path)
-          height = int(img.size[0])
-          newheight=int(lenghtwidthlist[1]) * height
-          width = img.size[1] 
-          newwidth = int(lenghtwidthlist[0]) * width
-          new_image = image.resize((newwidth, newheight))
-          new_image.save(filename)
-          await bot.send_photo(user_id,filename)
-          os.remove(filename)
-          os.remove(file_path)
 
-     
 @bot.on_message(filters.private & filters.reply & filters.regex("="))
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
