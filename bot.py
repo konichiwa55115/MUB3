@@ -183,7 +183,7 @@ def command20(bot,message):
      srt = YouTubeTranscriptApi.get_transcript(video_id,languages=['ar'])
      with open(subfile, "w") as f:
             for i in srt:
-             f.write(f" {i['text']} ")
+             f.write(f"{i['text']}")
      bot.send_document(yt_id,subfile)
      os.remove(subfile)
         
@@ -223,7 +223,8 @@ def command4(bot,message):
       temp = file.read().rstrip('\n') 
      numbofvid = int(temp) + 1
      os.remove(temptxt)
-     for i in range(1,numbofvid):
+     try : 
+      for i in range(1,numbofvid):
          cmd(f'sed -n {i}p yttransy.txt > "{temptxt}"')
          with open(temptxt, 'r') as file:
            link = file.read().rstrip('\n')  
@@ -232,16 +233,18 @@ def command4(bot,message):
           video_url = info_dict.get("url", None)
           video_id = info_dict.get("id", None)
           video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "") 
-          mp32file =   f"{video_title}.mp3"
-          txtresfile = f"{video_title}.txt"
-          mp42file =   f"{video_title}.mp4"
-         cmd(f'''yt-dlp -ciw  --extract-audio --audio-format mp3  -o "{video_title}" "{link}"''')
-         cmd(f'''python3 speech.py RK3ETXWBJQSMO262RXPAIXFSG6NH3QRH "{mp32file}" "{txtresfile}"''')
-         bot.send_document(yttransyid, txtresfile,caption=video_title)
-         os.remove(mp32file)
-         os.remove(temptxt)
-         os.remove(txtresfile)
-     os.remove("yttransy.txt")
+          subfile = f"{video_title}.txt"
+         srt = YouTubeTranscriptApi.get_transcript(video_id,languages=['ar'])
+         with open(subfile, "w") as f:
+            for i in srt:
+             f.write(f" {i['text']} ")
+         bot.send_document(yttransyid,subfile)
+         os.remove(subfile)
+      os.remove("yttransy.txt")
+  
+     except FileNotFoundError :
+        os.remove("yttransy.txt")
+
 @bot.on_message(filters.command('ytplst') & filters.text & filters.private)
 def command4(bot,message):
      x = message.text.split(" ")[1]
