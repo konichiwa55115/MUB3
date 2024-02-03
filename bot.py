@@ -709,7 +709,7 @@ async def _telegram_file(client, message):
      pass
  else :
      os.rename(x,file_path)
- await nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
+ replo = await nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
  filename = os.path.basename(file_path)
  nom,ex = os.path.splitext(filename)
  mp4file = f"{nom}.mp4"
@@ -780,7 +780,6 @@ async def _telegram_file(client, message):
         await CallbackQuery.edit_message_text("الآن أرسل الفيديو")
       elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(vidsubslist) == 1 :
        await CallbackQuery.edit_message_text("جار الإبدال ") 
-       print(vidsubslist[0])
        cmd(f'''ffmpeg -i "{vidsubslist[0]}" -i "{file_path}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id, mp4file)
        os.remove(file_path) 
@@ -805,7 +804,6 @@ async def _telegram_file(client, message):
       montaglist.clear()
      elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(montaglist) == 0 :
       montaglist.append(file_path)
-      print(len(montaglist))
       await CallbackQuery.edit_message_text("الآن أرسل الصورة") 
      elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(montaglist) == 1 :
       await CallbackQuery.edit_message_text("جار المنتجة") 
@@ -880,12 +878,11 @@ async def _telegram_file(client, message):
    os.remove(mp4file) 
 
   elif CallbackQuery.data == "trim" :
+    await replo.delete()
     if ex == ".pdf":
-      await CallbackQuery.edit_message_text("👇")
       await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
     else :
       await nepho.reply_text("الآن أرسل نقطة البداية والنهاية بهذه الصورة \n\n hh:mm:ss/hh:mm:ss",reply_markup=ForceReply(True))
-      await CallbackQuery.edit_message_text("👇") 
   elif CallbackQuery.data == "mod1":
       amplemode = 5
       await CallbackQuery.edit_message_text("جار التضخيم ")
@@ -960,7 +957,7 @@ async def _telegram_file(client, message):
 
 
   elif CallbackQuery.data == "renm":
-    await CallbackQuery.edit_message_text("👇") 
+    await replo.delete()
     await nepho.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
   
   elif CallbackQuery.data == "transcribe":
@@ -1232,6 +1229,7 @@ async def _telegram_file(client, message):
     if ex == ".mp4" or ex == ".mkv":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
     elif ex == ".png" or ex == ".jpg":
+      await replo.delete()
       await nepho.reply_text("الآن أدخل أبعاد الصورة الجديدة بهذه الصورة \n lenght:width ",reply_markup=ForceReply(True))
 
   elif CallbackQuery.data == "vidresnow11":
@@ -1289,6 +1287,7 @@ async def _telegram_file(client, message):
      imagedic.clear()
      os.remove(output_img)
   elif CallbackQuery.data == "imagetogif" :
+      await replo.delete()
       await nepho.reply_text("الآن أرسل مدة الفيديو بالثانية بهذه الصورة \n t=المدة",reply_markup=ForceReply(True))
   
   elif CallbackQuery.data == "convnow" :
@@ -1474,8 +1473,8 @@ async def _telegram_file(client, message):
     if user_id==6234365091 :
          upload = Uploader(file_path,videoupldtitle )
          snt = await CallbackQuery.edit_message_text("جار الرفع")
-         status, link = await upload.start(progress, snt)
-         await snt.edit_text(text=link, parse_mode=enums.ParseMode.MARKDOWN)
+         link = await upload.start(progress,snt)
+         await nepho.edit_text(text=link, parse_mode=enums.ParseMode.MARKDOWN)
          os.remove(file_path)
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
