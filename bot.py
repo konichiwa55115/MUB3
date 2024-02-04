@@ -1474,7 +1474,7 @@ async def _telegram_file(client, message):
          upload = Uploader(file_path,videoupldtitle )
          snt = await CallbackQuery.edit_message_text("جار الرفع")
          link = await upload.start(progress,snt)
-         await nepho.edit_text(text=link, parse_mode=enums.ParseMode.MARKDOWN)
+         await snt.edit_text(text=link, parse_mode=enums.ParseMode.MARKDOWN)
          os.remove(file_path)
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
