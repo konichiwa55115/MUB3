@@ -1224,6 +1224,8 @@ async def _telegram_file(client, message):
          await CallbackQuery.edit_message_text("تم الرفع")
       else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
+         os.remove(file_path)
+
   
   elif CallbackQuery.data == "vidasp":
     if ex == ".mp4" or ex == ".mkv":
@@ -1478,6 +1480,8 @@ async def _telegram_file(client, message):
          os.remove(file_path)
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
+         os.remove(file_path)
+
     
  
 
