@@ -718,7 +718,6 @@ async def _telegram_file(client, message):
  mergdir = f"./mergy/{mp3file}"
  trimdir = f"./trimmo/{mp3file}" 
  result = f"{nom}.txt"    
- videoupldtitle = nepho.caption
  @bot.on_callback_query()
  async def callback_query(CLIENT,CallbackQuery): 
   global amplemode
@@ -1473,6 +1472,7 @@ async def _telegram_file(client, message):
     shutil.rmtree(unzippath)
   elif  CallbackQuery.data == "upldtout" :
     if user_id==6234365091 :
+         videoupldtitle = nepho.caption
          upload = Uploader(file_path,videoupldtitle )
          snt = await CallbackQuery.edit_message_text("جار الرفع")
          link = await upload.start(progress,snt)
