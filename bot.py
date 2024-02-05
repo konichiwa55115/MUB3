@@ -527,7 +527,7 @@ def command20(bot,message):
      srt = YouTubeTranscriptApi.get_transcript(video_id,languages=['ar'])
      with open(subfile, "w") as f:
             for i in srt:
-             f.write(f"{i['text']}")
+             f.write(f" {i['text']} ")
      bot.send_document(yt_id,subfile)
      os.remove(subfile)
         
