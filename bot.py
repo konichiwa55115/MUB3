@@ -808,6 +808,7 @@ async def _telegram_file(client, message):
 
   
   elif CallbackQuery.data == "comp":
+   await CallbackQuery.edit_message_text("معالجة ⏱️")
    await downloadtoserver(nepho)
    if ex == ".pdf":
       await CallbackQuery.edit_message_text("جار الضغط")
@@ -856,6 +857,7 @@ async def _telegram_file(client, message):
  ########## خاصية التسريع  ###########
        
   elif CallbackQuery.data == "speedy":
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     await CallbackQuery.edit_message_text(text = CHOOSE_UR_SPEED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_SPEED_MODE_BUTTONS))
   elif CallbackQuery.data == "spd1":
@@ -881,6 +883,7 @@ async def _telegram_file(client, message):
  ########## خواص التحويل ###########
 
   elif CallbackQuery.data == "conv" :
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     if ex == ".jpg" or ex == ".png" :
       imagepdfdic1.append(file_path)
@@ -937,6 +940,7 @@ async def _telegram_file(client, message):
  ########## إبدال صوت الفيديو ###########
 
   elif  CallbackQuery.data == "subs":
+      await CallbackQuery.edit_message_text("معالجة ⏱️")
       await downloadtoserver(nepho)
       if (ex == ".mp4" or ex == ".mkv") and len(vidsubslist) == 0 :
          vidsubslist.append(file_path)
@@ -966,6 +970,7 @@ async def _telegram_file(client, message):
   ########## خاصية المنتجة  ###########
 
   elif  CallbackQuery.data == "imagetovid":
+     await CallbackQuery.edit_message_text("معالجة ⏱️")
      await downloadtoserver(nepho)
      if (ex == ".png" or ex == ".jpg") and len(montaglist) == 0 :
       montaglist.append(file_path)
@@ -1000,6 +1005,7 @@ async def _telegram_file(client, message):
  ########## خواص القص ###########
 
   elif CallbackQuery.data == "trim" :
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     await replo.delete()
     if ex == ".pdf":
@@ -1055,6 +1061,8 @@ async def _telegram_file(client, message):
  ########## خاصية التفريغ  ###########
   
   elif CallbackQuery.data == "transcribe":
+   await CallbackQuery.edit_message_text("معالجة ⏱️")
+   await downloadtoserver(nepho)
    if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" or ex == ".mkv" or ex == ".mp4" :
     try: 
       with open('transcription.txt', 'r') as fh:
@@ -1143,6 +1151,7 @@ async def _telegram_file(client, message):
  ########## خاصية كتم الفيديو ###########
 
   elif CallbackQuery.data == "mute":
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     await CallbackQuery.edit_message_text("جار الكتم")
     cmd(f'''ffmpeg -i "{file_path}" -c copy -an "{mp4file}"''')
@@ -1155,6 +1164,7 @@ async def _telegram_file(client, message):
 
 
   elif CallbackQuery.data == "audmerge":
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     if ex == ".m4a" or ex == ".mp3" or ex == ".ogg":
      await CallbackQuery.edit_message_text("جار الإضافة ")
@@ -1320,6 +1330,7 @@ async def _telegram_file(client, message):
   
   elif CallbackQuery.data == "upldarch":
       if user_id==6234365091 :
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
          await CallbackQuery.edit_message_text("جار الرفع")
          cmd(f'''rclone copy "{file_path}" 'myarchive':"{bucketname}"''')
@@ -1331,6 +1342,7 @@ async def _telegram_file(client, message):
 ##### تغيير أبعاد الفيديو ######
   
   elif CallbackQuery.data == "vidasp":
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     if ex == ".mp4" or ex == ".mkv":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
@@ -1374,6 +1386,7 @@ async def _telegram_file(client, message):
       ######### ترجمة + فيديو ############
   
   elif CallbackQuery.data == "vidsrt" :
+     await CallbackQuery.edit_message_text("معالجة ⏱️")
      await downloadtoserver(nepho)
      if (len(vidsrt) == 0 or len(vidsrt) > 2 ) and (ex == ".ass" or ex == ".srt") :
         vidsrt.clear()
@@ -1448,6 +1461,7 @@ async def _telegram_file(client, message):
     ############  خاصية الأرشفة ######## 
 
   elif  CallbackQuery.data == "zipfile" :
+    await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     cmd('mkdir zipdir')
     mergeviditem = f"./zipdir/{filename}"
@@ -1465,6 +1479,7 @@ async def _telegram_file(client, message):
     ############خواص الاستخراج ###########
 
   elif  CallbackQuery.data == "unzip" :
+   await CallbackQuery.edit_message_text("معالجة ⏱️")
    await downloadtoserver(nepho)
    unzippath = "./unzipprocess/"
    cmd(f'mkdir "{unzippath}"')
@@ -1513,6 +1528,7 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "upldtout" :
     if user_id==6234365091 :
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
          videoupldtitle = nepho.caption
          upload = Uploader(file_path,videoupldtitle )
