@@ -776,32 +776,37 @@ async def _telegram_file(client, message):
       await CallbackQuery.edit_message_text("جار التضخيم ")
       await downloadtoserver(nepho)
       await amplify(5)
-      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")
+      queeq.clear()   
      
 
   elif CallbackQuery.data == "mod2":
       await CallbackQuery.edit_message_text("جار التضخيم ")
       await downloadtoserver(nepho)
       await amplify(10)
-      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")
+      queeq.clear()   
       
   elif CallbackQuery.data == "mod3":
       await CallbackQuery.edit_message_text("جار التضخيم ")
       await downloadtoserver(nepho)
       await amplify(15)
-      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ") 
+      queeq.clear()  
 
   elif CallbackQuery.data == "mod4" :
       await CallbackQuery.edit_message_text("جار التضخيم ")
       await downloadtoserver(nepho)
       await amplify(20)
-      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")
+      queeq.clear()   
 
   elif CallbackQuery.data == "mod5":
       await CallbackQuery.edit_message_text("جار التضخيم ")
       await downloadtoserver(nepho)
       await amplify(25)
-      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ") 
+      queeq.clear()  
 
 
  ########## خواص الضغط ###########
@@ -820,39 +825,46 @@ async def _telegram_file(client, message):
       await bot.send_document(user_id, filename)
       await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
       os.remove(file_path) 
-      os.remove(filename) 
+      os.remove(filename)
+      queeq.clear() 
    elif ex == ".mkv" or ex == ".mp4":
     cmd(f'''ffmpeg -y -i "{file_path}" -vf "setpts=1*PTS" -r 10 "{mp4file}"''')
     await bot.send_video(user_id,mp4file)
     await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
     os.remove(mp4file)
     os.remove(file_path)
+    queeq.clear()
    elif ex == ".mp3" or ex == ".m4a" or ex == ".ogg":
     await CallbackQuery.edit_message_text(text = CHOOSE_UR_COMP_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_COMP_MODE_BUTTONS) )
   elif  CallbackQuery.data == "compmod1":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     await compressaud("10k")
-    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ") 
+    queeq.clear()  
 
   elif  CallbackQuery.data == "compmod2":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     await compressaud("20k")
-    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ") 
+    queeq.clear()  
 
   elif  CallbackQuery.data == "compmod3":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     await compressaud("30k") 
-    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ") 
+    queeq.clear()  
 
   elif  CallbackQuery.data == "compmod4":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     await compressaud("40k")
-    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")
+    queeq.clear()
 
   elif  CallbackQuery.data == "compmod5":
     await CallbackQuery.edit_message_text("جار الضغط ") 
     await compressaud("50k")
     await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+    queeq.clear()
 
  ########## خاصية التسريع  ###########
        
@@ -863,20 +875,25 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "spd1":
    await CallbackQuery.edit_message_text("جار التسريع")
    await spoody(0.8,1.25)
-   await CallbackQuery.edit_message_text("تم التسريع ✅  ")   
+   await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+   queeq.clear()  
 
   elif CallbackQuery.data == "spd2":
     await CallbackQuery.edit_message_text("جار التسريع")
     await spoody(1.5,0.66666666666)
     await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+    queeq.clear()
   elif CallbackQuery.data == "spd3":
     await CallbackQuery.edit_message_text("جار التسريع")
     await spoody(1.75,0.57142857142)
     await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+    queeq.clear()
   elif CallbackQuery.data == "spd4":
     await CallbackQuery.edit_message_text("جار التسريع")
     await spoody(2,0.5) 
     await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+    queeq.clear()
+
   
 
 
@@ -895,19 +912,25 @@ async def _telegram_file(client, message):
       await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
     else :
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
+    queeq.clear() 
   elif CallbackQuery.data == "audconv" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
    await convy(mp3file)
    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+   queeq.clear()
+
   elif CallbackQuery.data == "audconvm4a" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
    await convy(m4afile)
    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+   queeq.clear()
    
   elif CallbackQuery.data == "vidconv" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
    await convy(mp4file)
    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+   queeq.clear()
+
 
   elif CallbackQuery.data == "convnow" :
     pdffile = f"{nom}.pdf"
@@ -919,6 +942,8 @@ async def _telegram_file(client, message):
       os.remove(str(imagepdfdic1[x]))
     imagepdfdic1.clear()
     imagepdfdic.clear()
+    queeq.clear()
+
 
  ########## خاصية تغيير الصوت ###########
 
@@ -936,6 +961,8 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تم تحويل الصوت ✅  ") 
     os.remove(file_path) 
     os.remove(mp3file) 
+    queeq.clear()
+
 
  ########## إبدال صوت الفيديو ###########
 
@@ -966,6 +993,8 @@ async def _telegram_file(client, message):
        os.remove(mp4file) 
        os.remove(vidsubslist[0]) 
        vidsubslist.clear()
+      queeq.clear()
+
 
   ########## خاصية المنتجة  ###########
 
@@ -1000,6 +1029,8 @@ async def _telegram_file(client, message):
       os.remove(mp3file) 
       os.remove(montaglist[0])
       montaglist.clear()
+     queeq.clear()
+
 
 
  ########## خواص القص ###########
@@ -1029,6 +1060,7 @@ async def _telegram_file(client, message):
       await CallbackQuery.edit_message_text("تم القص  ✅  ") 
       os.remove(file_path) 
       os.remove(mp4file) 
+    queeq.clear()
   elif CallbackQuery.data == "reversetrim" :
      await CallbackQuery.edit_message_text("جار القص  ")
      starsec = re.split(':',strt_point)
@@ -1050,6 +1082,7 @@ async def _telegram_file(client, message):
      await CallbackQuery.edit_message_text("تم القص  ✅  ")
      os.remove(mp3file)
      os.remove(file_path)
+     queeq.clear()
   
   
  ########## خاصية إعادة التسمية ###########
@@ -1147,6 +1180,7 @@ async def _telegram_file(client, message):
     await nepho.reply(textspaced[:-1], quote=True, disable_web_page_preview=True)
     await CallbackQuery.edit_message_text("تم التفريغ  ✅  ")
     os.remove(file_path) 
+   queeq.clear()
 
  ########## خاصية كتم الفيديو ###########
 
@@ -1159,6 +1193,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تم الكتم  ✅  ")
     os.remove(file_path) 
     os.remove(mp4file) 
+    queeq.clear()
 
  ##########  خواص الدمج ###########
 
@@ -1186,6 +1221,7 @@ async def _telegram_file(client, message):
       with open('pdfy.txt','a') as f:
        f.write(f'''{pdfdir} \n''')  
       await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
+    queeq.clear()  
 
   elif CallbackQuery.data == "mergenow":
     await CallbackQuery.edit_message_text("جار الدمج") 
@@ -1203,6 +1239,7 @@ async def _telegram_file(client, message):
     os.remove(mp3file)
     shutil.rmtree('./mergy/') 
     audmergelist.clear()
+    queeq.clear()
   
   elif CallbackQuery.data == "pdfmergenow":
       await CallbackQuery.edit_message_text("جار الدمج")
@@ -1221,6 +1258,7 @@ async def _telegram_file(client, message):
       shutil.rmtree("./pdfmerge/")
       cmd(f'''rm "{pdfmerged}" pdfy.txt''')
       os.remove(pdfmerged);os.remove("pdfy.txt")
+      queeq.clear()
 
   elif CallbackQuery.data == "imagemergenow" :
           await CallbackQuery.edit_message_text(text = PRESS_MERGEMODE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGEMODE_IMAGE_BUTTONS))
@@ -1242,6 +1280,7 @@ async def _telegram_file(client, message):
       os.remove(str(imagedic[x]))
      imagedic.clear()
      os.remove(output_img)
+     queeq.clear()
 
   elif CallbackQuery.data == "updown" :
      output_img = f"{nom}.jpg"
@@ -1263,8 +1302,10 @@ async def _telegram_file(client, message):
       os.remove(str(imagedic[x]))
      imagedic.clear()
      os.remove(output_img)
+     queeq.clear()
 
   elif  CallbackQuery.data == "vidmergenow" :
+     await CallbackQuery.edit_message_text("جار الدمج")
      for x in range(1,len(vidmergelist)):
         cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "mod.mp4"''') 
         os.rename("mod.mp4",mp4file)
@@ -1278,7 +1319,7 @@ async def _telegram_file(client, message):
      shutil.rmtree("./data/")
      os.remove(mp4file)
      vidmergelist.clear()
-        
+     queeq.clear()   
 
       ###### خاصية التقسيم #######
 
@@ -1325,6 +1366,8 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تم التقسيم  ✅  ")
     os.remove("mod.mp3") 
     os.remove(file_path) 
+    queeq.clear()
+
 
     ########## خاصية الرفع لأرشيف
   
@@ -1338,6 +1381,7 @@ async def _telegram_file(client, message):
          await CallbackQuery.edit_message_text("تم الرفع  ✅  ")
       else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
+      queeq.clear()
 
 ##### تغيير أبعاد الفيديو ######
   
@@ -1346,9 +1390,9 @@ async def _telegram_file(client, message):
     await downloadtoserver(nepho)
     if ex == ".mp4" or ex == ".mkv":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
-    elif ex == ".png" or ex == ".jpg":
-      await replo.delete()
-      await nepho.reply_text("الآن أدخل أبعاد الصورة الجديدة بهذه الصورة \n lenght:width ",reply_markup=ForceReply(True))
+   # elif ex == ".png" or ex == ".jpg":
+    #  await replo.delete()
+     # await nepho.reply_text("الآن أدخل أبعاد الصورة الجديدة بهذه الصورة \n lenght:width ",reply_markup=ForceReply(True))
 
   elif CallbackQuery.data == "vidresnow11":
     await  CallbackQuery.edit_message_text("جار التحويل")
@@ -1357,6 +1401,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تم التحويل   ✅  ")
     os.remove(mp4file)
     os.remove(file_path)
+    queeq.clear()
 
   elif CallbackQuery.data == "vidresnow169":
     await  CallbackQuery.edit_message_text("جار التحويل")
@@ -1365,6 +1410,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تم التحويل  ✅  ")
     os.remove(mp4file)
     os.remove(file_path)
+    queeq.clear()
 
 ########### خاصية إزالة الصمت ##########
 
@@ -1376,6 +1422,7 @@ async def _telegram_file(client, message):
    await CallbackQuery.edit_message_text("تمت إزالة الصمت  ✅  ")
    os.remove(file_path)
    os.remove(mp3file)
+   queeq.clear()
 
    ######## تحويل الصورة إلى gif##########
  
@@ -1417,7 +1464,7 @@ async def _telegram_file(client, message):
         os.remove(vidfile)
         os.remove(mp4file)
         vidsrt.clear()
-  
+     queeq.clear()
   
   ######### خاصية عكس الـpdf  #########
 
@@ -1436,8 +1483,7 @@ async def _telegram_file(client, message):
         colour=(255, 255, 255, 255),
         annotations=True,
         greyscale=False,
-        optimise_mode=pdfium.OptimiseMode.NONE,
-    )
+        optimise_mode=pdfium.OptimiseMode.NONE,)
      pil_image.save(f"./rvtemp/image_{page_number+1}.png")
     os.remove(file_path)
     rpdfpage = [] 
@@ -1457,6 +1503,7 @@ async def _telegram_file(client, message):
     shutil.rmtree("./rvtemp/")
     imagepdfdic.clear()
     rpdfpage.clear()
+    queeq.clear()
 
     ############  خاصية الأرشفة ######## 
 
@@ -1474,7 +1521,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تمت الأرشفة  ✅  ")
     os.remove(zipfile)
     shutil.rmtree("./zipdir/")
-
+    queeq.clear()
 
     ############خواص الاستخراج ###########
 
@@ -1521,8 +1568,8 @@ async def _telegram_file(client, message):
       sentfile = f"{unzippath}{images[x]}"
       await bot.send_document(user_id,sentfile)
     shutil.rmtree(unzippath)
-
    await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+   queeq.clear()
 
     ############ خاصية الرفع ليوتيوب ###########
 
@@ -1538,12 +1585,8 @@ async def _telegram_file(client, message):
          os.remove(file_path)
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
-
+    queeq.clear()
     
- 
-
-     
-  queeq.clear()
 
 @bot.on_message(filters.private & filters.reply & filters.regex("="))
 async def refunc(client,message):
@@ -1560,6 +1603,7 @@ async def refunc(client,message):
           os.remove(mp4file)
           os.remove(f"mod{mp4file}")
           os.remove(file_path)
+          queeq.clear()
 
 @bot.on_message(filters.private & filters.reply & filters.regex('/'))
 async def refunc(client,message):
@@ -1574,6 +1618,7 @@ async def refunc(client,message):
           strt, end = os.path.split(endstart);strt_point=strt 
           end_point = end
           await message.reply(text = CHOOSE_UR_TRIMMODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_TRIMMODE_BUTTONS))
+          queeq.clear()
 @bot.on_message(filters.private & filters.reply & filters.regex("-"))
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
@@ -1600,6 +1645,7 @@ async def refunc(client,message):
             await bot.send_document(user_id,f)
           os.remove(file_path) 
           os.remove(filename)
+          queeq.clear()
 @bot.on_message(filters.private & filters.reply )
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
@@ -1620,6 +1666,7 @@ async def refunc(client,message):
           else : 
              await bot.send_document(user_id,newfile)
           os.remove(newfile)
+          queeq.clear()
 
 
 
