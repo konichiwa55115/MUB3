@@ -379,7 +379,68 @@ async def _auth(c: bot, m: Message) -> None:
     except Exception as e:
         await m.reply_text("فشلت المصادقة للأسف", True)
 
-
+async def downloadtoserver(x):
+ global user_id ,file_path,filename,nom,ex,mp4file,mp3file,m4afile,spdrateaud,mergdir,trimdir,result
+ h = await x.download(file_name="./downloads/")
+ file_path = h.replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
+ if file_path == h :
+     pass
+ else :
+     os.rename(x,file_path)
+ filename = os.path.basename(file_path)
+ nom,ex = os.path.splitext(filename)
+ mp4file = f"{nom}.mp4"
+ mp3file = f"{nom}.mp3"
+ user_id = x.from_user.id
+ m4afile = f"{nom}.m4a"
+ mergdir = f"./mergy/{mp3file}"
+ trimdir = f"./trimmo/{mp3file}"
+ result = f"{nom}.txt" 
+async def compressaud(rate):
+    cmd(f''' ffmpeg -i "{file_path}" -b:a "{rate}" "{mp3file}" -y ''' )
+    await bot.send_audio(user_id, mp3file)
+    os.remove(file_path) 
+    os.remove(mp3file) 
+async def amplify(amplemode):
+ if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        await bot.send_audio(user_id, mp3file)
+        os.remove(file_path) 
+        os.remove(mp3file) 
+ elif (ex == ".mp4" or ex == ".mkv") :
+        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
+        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
+        await bot.send_video(user_id, filename) 
+        os.remove(file_path) 
+        os.remove(filename) 
+async def convy(k):
+   if k == m4afile :
+       cmd(f'''ffmpeg -i "{file_path}" -c:a aac -b:a 192k "{m4afile}" -y ''')
+       await bot.send_audio(user_id, m4afile)
+       os.remove(file_path) 
+       os.remove(m4afile) 
+   elif k == mp3file :
+      cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
+      await  bot.send_audio(user_id, mp3file)
+      os.remove(file_path) 
+      os.remove(mp3file)
+   elif k == mp4file :
+      cmd(f'''ffmpeg -i "{file_path}" -codec copy "{mp4file}" -y ''')
+      await bot.send_video(user_id, mp4file)
+      os.remove(file_path) 
+      os.remove(mp4file) 
+async def spoody(spdrateaud,spdratevid):
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
+      await bot.send_audio(user_id, mp3file) 
+      os.remove(file_path) 
+      os.remove(mp3file) 
+    elif (ex == ".mp4" or ex == ".mkv") :
+       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
+       await  bot.send_video(user_id,mp4file)
+       os.remove(file_path) 
+       os.remove(mp4file) 
+   
 def merge_images1(file1, file2):
     image1 = Image.open(file1)
     image2 = Image.open(file2)
@@ -693,38 +754,61 @@ def command2(bot,message):
 
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
 async def _telegram_file(client, message):
- global user_id ,file_path,filename,nom,ex,mp4file,mp3file,m4afile,spdrateaud,mergdir,trimdir,result,nepho
  if len(queeq) == 0 : 
     pass
  else :
     await asyncio.sleep(30)
     queeq.clear()
     pass
+ queeq.append(message.from_user.id)
+ global  replo,nepho
+ replo = await message.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
  nepho = message
- user_id = nepho.from_user.id
- queeq.append(user_id)
- x =  await nepho.download(file_name="./downloads/")
- file_path = x.replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
- if file_path == x :
-     pass
- else :
-     os.rename(x,file_path)
- replo = await nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
- filename = os.path.basename(file_path)
- nom,ex = os.path.splitext(filename)
- mp4file = f"{nom}.mp4"
- mp3file = f"{nom}.mp3"
- m4afile = f"{nom}.m4a"
- mergdir = f"./mergy/{mp3file}"
- trimdir = f"./trimmo/{mp3file}" 
- result = f"{nom}.txt"    
+ 
  @bot.on_callback_query()
  async def callback_query(CLIENT,CallbackQuery): 
-  global amplemode
-  await CallbackQuery.edit_message_text("جار العمل")
+
+########## خواص التضخيم ###########
+
   if CallbackQuery.data == "amplifyaud":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_AMPLE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AMPLE_MODE_BUTTONS))
+  elif CallbackQuery.data == "mod1":
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      await downloadtoserver(nepho)
+      await amplify(5)
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+     
+
+  elif CallbackQuery.data == "mod2":
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      await downloadtoserver(nepho)
+      await amplify(10)
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+      
+  elif CallbackQuery.data == "mod3":
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      await downloadtoserver(nepho)
+      await amplify(15)
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+
+  elif CallbackQuery.data == "mod4" :
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      await downloadtoserver(nepho)
+      await amplify(20)
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+
+  elif CallbackQuery.data == "mod5":
+      await CallbackQuery.edit_message_text("جار التضخيم ")
+      await downloadtoserver(nepho)
+      await amplify(25)
+      await CallbackQuery.edit_message_text("تم التضخيم ✅  ")   
+
+
+ ########## خواص الضغط ###########
+
+  
   elif CallbackQuery.data == "comp":
+   await downloadtoserver(nepho)
    if ex == ".pdf":
       await CallbackQuery.edit_message_text("جار الضغط")
       PDFNet.Initialize("demo:1676040759361:7d2a298a03000000006027df7c81c9e05abce088e7286e8312e5e06886"); doc = PDFDoc(f"{file_path}")
@@ -733,21 +817,108 @@ async def _telegram_file(client, message):
       doc.Save(f"{filename}", SDFDoc.e_linearized)
       doc.Close()
       await bot.send_document(user_id, filename)
+      await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
       os.remove(file_path) 
       os.remove(filename) 
    elif ex == ".mkv" or ex == ".mp4":
     cmd(f'''ffmpeg -y -i "{file_path}" -vf "setpts=1*PTS" -r 10 "{mp4file}"''')
     await bot.send_video(user_id,mp4file)
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
     os.remove(mp4file)
     os.remove(file_path)
    elif ex == ".mp3" or ex == ".m4a" or ex == ".ogg":
     await CallbackQuery.edit_message_text(text = CHOOSE_UR_COMP_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_COMP_MODE_BUTTONS) )
   elif  CallbackQuery.data == "compmod1":
     await CallbackQuery.edit_message_text("جار الضغط ") 
-    cmd(f''' ffmpeg -i "{file_path}" -b:a 10k "{mp3file}" -y ''' )
-    await bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file) 
+    await compressaud("10k")
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+
+  elif  CallbackQuery.data == "compmod2":
+    await CallbackQuery.edit_message_text("جار الضغط ") 
+    await compressaud("20k")
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+
+  elif  CallbackQuery.data == "compmod3":
+    await CallbackQuery.edit_message_text("جار الضغط ") 
+    await compressaud("30k") 
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+
+  elif  CallbackQuery.data == "compmod4":
+    await CallbackQuery.edit_message_text("جار الضغط ") 
+    await compressaud("40k")
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+
+  elif  CallbackQuery.data == "compmod5":
+    await CallbackQuery.edit_message_text("جار الضغط ") 
+    await compressaud("50k")
+    await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
+
+ ########## خاصية التسريع  ###########
+       
+  elif CallbackQuery.data == "speedy":
+    await downloadtoserver(nepho)
+    await CallbackQuery.edit_message_text(text = CHOOSE_UR_SPEED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_SPEED_MODE_BUTTONS))
+  elif CallbackQuery.data == "spd1":
+   await CallbackQuery.edit_message_text("جار التسريع")
+   await spoody(0.8,1.25)
+   await CallbackQuery.edit_message_text("تم التسريع ✅  ")   
+
+  elif CallbackQuery.data == "spd2":
+    await CallbackQuery.edit_message_text("جار التسريع")
+    await spoody(1.5,0.66666666666)
+    await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+  elif CallbackQuery.data == "spd3":
+    await CallbackQuery.edit_message_text("جار التسريع")
+    await spoody(1.75,0.57142857142)
+    await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+  elif CallbackQuery.data == "spd4":
+    await CallbackQuery.edit_message_text("جار التسريع")
+    await spoody(2,0.5) 
+    await CallbackQuery.edit_message_text("تم التسريع ✅  ") 
+  
+
+
+ ########## خواص التحويل ###########
+
+  elif CallbackQuery.data == "conv" :
+    await downloadtoserver(nepho)
+    if ex == ".jpg" or ex == ".png" :
+      imagepdfdic1.append(file_path)
+      global imagey
+      imagey = Image.open(imagepdfdic1[0]).convert('RGB')
+      if len(imagepdfdic1) > 1 :
+       image2 = Image.open(file_path).convert('RGB')
+       imagepdfdic.append(image2)
+      await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
+    else :
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
+  elif CallbackQuery.data == "audconv" :
+   await CallbackQuery.edit_message_text("جار التحويل ") 
+   await convy(mp3file)
+   await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+  elif CallbackQuery.data == "audconvm4a" :
+   await CallbackQuery.edit_message_text("جار التحويل ") 
+   await convy(m4afile)
+   await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+   
+  elif CallbackQuery.data == "vidconv" :
+   await CallbackQuery.edit_message_text("جار التحويل ") 
+   await convy(mp4file)
+   await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+
+  elif CallbackQuery.data == "convnow" :
+    pdffile = f"{nom}.pdf"
+    imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
+    await bot.send_document(user_id,pdffile)
+    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
+    os.remove(pdffile)
+    for x in range(0,len(imagepdfdic1)) :
+      os.remove(str(imagepdfdic1[x]))
+    imagepdfdic1.clear()
+    imagepdfdic.clear()
+
+ ########## خاصية تغيير الصوت ###########
+
   elif  CallbackQuery.data == "voicy":  
     await CallbackQuery.edit_message_text("جار تغيير الصوت ") 
     if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" :
@@ -759,10 +930,14 @@ async def _telegram_file(client, message):
        await bot.send_video(user_id,mp4file)
        os.remove(mp4file)
 
+    await CallbackQuery.edit_message_text("تم تحويل الصوت ✅  ") 
     os.remove(file_path) 
     os.remove(mp3file) 
- 
+
+ ########## إبدال صوت الفيديو ###########
+
   elif  CallbackQuery.data == "subs":
+      await downloadtoserver(nepho)
       if (ex == ".mp4" or ex == ".mkv") and len(vidsubslist) == 0 :
          vidsubslist.append(file_path)
          await CallbackQuery.edit_message_text("الآن أرسل الصوتية")
@@ -770,6 +945,7 @@ async def _telegram_file(client, message):
        await CallbackQuery.edit_message_text("جار الإبدال ") 
        cmd(f'''ffmpeg -i "{file_path}" -i "{vidsubslist[0]}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id, mp4file)
+       await CallbackQuery.edit_message_text("تم الإبدال ✅  ") 
        os.remove(file_path) 
        os.remove(mp4file) 
        os.remove(vidsubslist[0]) 
@@ -781,13 +957,16 @@ async def _telegram_file(client, message):
        await CallbackQuery.edit_message_text("جار الإبدال ") 
        cmd(f'''ffmpeg -i "{vidsubslist[0]}" -i "{file_path}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id, mp4file)
+       await CallbackQuery.edit_message_text("تم الإبدال ✅  ")
        os.remove(file_path) 
        os.remove(mp4file) 
        os.remove(vidsubslist[0]) 
        vidsubslist.clear()
 
- 
+  ########## خاصية المنتجة  ###########
+
   elif  CallbackQuery.data == "imagetovid":
+     await downloadtoserver(nepho)
      if (ex == ".png" or ex == ".jpg") and len(montaglist) == 0 :
       montaglist.append(file_path)
       await CallbackQuery.edit_message_text("الآن أرسل الصوتية") 
@@ -796,6 +975,7 @@ async def _telegram_file(client, message):
       cmd(f'''ffmpeg -i "{montaglist[0]}" -q:a 0 -map a "{mp3file}" -y ''')
       cmd(f'''ffmpeg -r 1 -loop 1 -y -i  "{file_path}" -i "{mp3file}" -c:v libx264 -tune stillimage -c:a copy -shortest -vf scale=1920:1080 "{mp4file}"''')
       await bot.send_video(user_id, mp4file)
+      await CallbackQuery.edit_message_text("تمت المنتجة  ✅  ")
       os.remove(file_path) 
       os.remove(mp4file)
       os.remove(mp3file) 
@@ -809,6 +989,7 @@ async def _telegram_file(client, message):
       cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
       cmd(f'''ffmpeg -r 1 -loop 1 -y -i  "{montaglist[0]}" -i "{mp3file}" -c:v libx264 -tune stillimage -c:a copy -shortest -vf scale=1920:1080 "{mp4file}"''')
       await bot.send_video(user_id, mp4file)
+      await CallbackQuery.edit_message_text("تمت المنتجة  ✅  ")
       os.remove(file_path) 
       os.remove(mp4file)
       os.remove(mp3file) 
@@ -816,148 +997,62 @@ async def _telegram_file(client, message):
       montaglist.clear()
 
 
- 
-  elif  CallbackQuery.data == "compmod2":
-    await CallbackQuery.edit_message_text("جار الضغط ") 
-    cmd(f''' ffmpeg -i "{file_path}" -b:a 20k "{mp3file}" -y ''' )
-    await bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file) 
-
-  elif  CallbackQuery.data == "compmod3":
-    await CallbackQuery.edit_message_text("جار الضغط ") 
-    cmd(f''' ffmpeg -i "{file_path}" -b:a 30k "{mp3file}" -y ''' )
-    await bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file)  
-
-  elif  CallbackQuery.data == "compmod4":
-    await CallbackQuery.edit_message_text("جار الضغط ") 
-    cmd(f''' ffmpeg -i "{file_path}" -b:a 40k "{mp3file}" -y ''' )
-    await bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file) 
-
-  elif  CallbackQuery.data == "compmod5":
-    await CallbackQuery.edit_message_text("جار الضغط ") 
-    cmd(f''' ffmpeg -i "{file_path}" -b:a 50k "{mp3file}" -y ''' )
-    await bot.send_audio(user_id, mp3file)
-    os.remove(file_path) 
-    os.remove(mp3file) 
-
-  elif CallbackQuery.data == "conv" :
-    if ex == ".jpg" or ex == ".png" :
-      imagepdfdic1.append(file_path)
-      global imagey
-      imagey = Image.open(imagepdfdic1[0]).convert('RGB')
-      if len(imagepdfdic1) > 1 :
-       image2 = Image.open(file_path).convert('RGB')
-       imagepdfdic.append(image2)
-      await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
-    else :
-     await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
-  elif CallbackQuery.data == "audconv" :
-   await CallbackQuery.edit_message_text("جار التحويل ") 
-   cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
-   await  bot.send_audio(user_id, mp3file)
-   os.remove(file_path) 
-   os.remove(mp3file) 
-  elif CallbackQuery.data == "audconvm4a" :
-   await CallbackQuery.edit_message_text("جار التحويل ") 
-   cmd(f'''ffmpeg -i "{file_path}" -c:a aac -b:a 192k "{m4afile}" -y ''')
-   await bot.send_audio(user_id, m4afile)
-   os.remove(file_path) 
-   os.remove(m4afile) 
-
-  elif CallbackQuery.data == "vidconv" :
-   await CallbackQuery.edit_message_text("جار التحويل " ) 
-   cmd(f'''ffmpeg -i "{file_path}" -codec copy "{mp4file}" -y ''')
-   await bot.send_video(user_id, mp4file)
-   os.remove(file_path) 
-   os.remove(mp4file) 
+ ########## خواص القص ###########
 
   elif CallbackQuery.data == "trim" :
+    await downloadtoserver(nepho)
     await replo.delete()
     if ex == ".pdf":
       await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
     else :
       await nepho.reply_text("الآن أرسل نقطة البداية والنهاية بهذه الصورة \n\n hh:mm:ss/hh:mm:ss",reply_markup=ForceReply(True))
-  elif CallbackQuery.data == "mod1":
-      amplemode = 5
-      await CallbackQuery.edit_message_text("جار التضخيم ")
-      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        await bot.send_audio(user_id, mp3file)
-        os.remove(file_path) 
-        os.remove(mp3file) 
-      elif (ex == ".mp4" or ex == ".mkv") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
-        await bot.send_video(user_id, filename) 
-        os.remove(file_path) 
-        os.remove(filename) 
-
-  elif CallbackQuery.data == "mod2":
-      amplemode = 10
-      await CallbackQuery.edit_message_text("جار التضخيم ")
-      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        await bot.send_audio(user_id, mp3file)
-        os.remove(file_path) 
-        os.remove(mp3file) 
-      elif (ex == ".mp4" or ex == ".mkv") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
-        await bot.send_video(user_id, filename) 
-        os.remove(file_path) 
-        os.remove(filename)
-  elif CallbackQuery.data == "mod3":
-      amplemode = 15
-      await CallbackQuery.edit_message_text("جار التضخيم ")
-      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        await bot.send_audio(user_id, mp3file)
-        os.remove(file_path) 
-        os.remove(mp3file) 
-      elif (ex == ".mp4" or ex == ".mkv") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
-        await bot.send_video(user_id, filename) 
-        os.remove(file_path) 
-        os.remove(filename)
-  elif CallbackQuery.data == "mod4" :
-      amplemode = 20
-      await CallbackQuery.edit_message_text("جار التضخيم ")
-      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        await bot.send_audio(user_id, mp3file)
-        os.remove(file_path) 
-        os.remove(mp3file) 
-      elif (ex == ".mp4" or ex == ".mkv") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
-        await bot.send_video(user_id, filename) 
-        os.remove(file_path) 
-        os.remove(filename)
-  elif CallbackQuery.data == "mod5":
-      amplemode = 25
-      await CallbackQuery.edit_message_text("جار التضخيم ")
-      if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        await bot.send_audio(user_id, mp3file)
-        os.remove(file_path) 
-        os.remove(mp3file) 
-      elif (ex == ".mp4" or ex == ".mkv") :
-        cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
-        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
-        await bot.send_video(user_id, filename) 
-        os.remove(file_path) 
-        os.remove(filename)
-
+  elif CallbackQuery.data == "normaltrim" :
+    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+       await CallbackQuery.edit_message_text("جار القص")  
+       cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "trim{mp3file}" -y ''')
+       cmd(f'''ffmpeg -i "trim{mp3file}" -ss {strt_point} -to {end_point} -c copy "{mp3file}" -y ''')
+       await  bot.send_audio(user_id, mp3file)
+       await CallbackQuery.edit_message_text("تم القص  ✅  ")
+       os.remove(file_path) 
+       os.remove(mp3file) 
+       os.remove(f"trim{mp3file}")
+    elif (ex == ".mp4" or ex == ".mkv") :
+      await CallbackQuery.edit_message_text("جار القص")  
+      cmd(f'''ffmpeg -i "{file_path}" -ss {strt_point} -strict -2 -to {end_point} -c:a aac -codec:v h264 -b:v 1000k "{mp4file}" -y ''')
+      await bot.send_video(user_id, mp4file)  
+      await CallbackQuery.edit_message_text("تم القص  ✅  ") 
+      os.remove(file_path) 
+      os.remove(mp4file) 
+  elif CallbackQuery.data == "reversetrim" :
+     await CallbackQuery.edit_message_text("جار القص  ")
+     starsec = re.split(':',strt_point)
+     if len(starsec) == 3 :
+        strtseconds = int(starsec[0])*60*60 + int(starsec[1])*60 + int(starsec[2])
+     elif len(starsec) == 2 : 
+         strtseconds = int(starsec[0])*60 + int(starsec[1])
+     elif len(starsec) == 1 : 
+        strtseconds =  int(starsec[0])
+     endsec = re.split(':',end_point)
+     if len(endsec) == 3 :
+        endseconds = int(endsec[0])*60*60 + int(endsec[1])*60 + int(endsec[2])
+     elif len(endsec) == 2 : 
+         endseconds = int(endsec[0])*60 + int(endsec[1])
+     elif len(endsec) == 1 : 
+        endseconds =  int(endsec[0])
+     cmd(f'''ffmpeg -i "{file_path}" -af "aselect='not(between(t,{strtseconds},{endseconds}))'" "{mp3file}"''')
+     await bot.send_audio(user_id,mp3file)
+     await CallbackQuery.edit_message_text("تم القص  ✅  ")
+     os.remove(mp3file)
+     os.remove(file_path)
+  
+  
+ ########## خاصية إعادة التسمية ###########
 
   elif CallbackQuery.data == "renm":
     await replo.delete()
-    await nepho.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
+    await message.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
+
+ ########## خاصية التفريغ  ###########
   
   elif CallbackQuery.data == "transcribe":
    if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" or ex == ".mkv" or ex == ".mp4" :
@@ -1028,6 +1123,7 @@ async def _telegram_file(client, message):
      coca +=1
     os.rename("final.txt",result)
     await bot.send_document(user_id, result)
+    await CallbackQuery.edit_message_text("تم التفريغ  ✅  ")
     shutil.rmtree('./temp/') 
     os.remove(result)
    elif  ex == ".jpg" or ex == ".png" :
@@ -1041,84 +1137,25 @@ async def _telegram_file(client, message):
     text = pytesseract.image_to_string(file_path, lang=f"{lang_code}")
     textspaced = re.sub(r'\r\n|\r|\n', ' ', text)
     await nepho.reply(textspaced[:-1], quote=True, disable_web_page_preview=True)
+    await CallbackQuery.edit_message_text("تم التفريغ  ✅  ")
     os.remove(file_path) 
 
+ ########## خاصية كتم الفيديو ###########
 
   elif CallbackQuery.data == "mute":
+    await downloadtoserver(nepho)
     await CallbackQuery.edit_message_text("جار الكتم")
     cmd(f'''ffmpeg -i "{file_path}" -c copy -an "{mp4file}"''')
     await bot.send_document(user_id, mp4file)
+    await CallbackQuery.edit_message_text("تم الكتم  ✅  ")
     os.remove(file_path) 
     os.remove(mp4file) 
 
-  elif CallbackQuery.data == "speedy":
-    await CallbackQuery.edit_message_text(text = CHOOSE_UR_SPEED_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_SPEED_MODE_BUTTONS))
-  elif CallbackQuery.data == "spd1":
-    global spdratevid
-    spdratevid = 0.8
-    global spdrateaud
-    spdrateaud = 1.25
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-      await CallbackQuery.edit_message_text("جار التسريع")
-      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
-      await bot.send_audio(user_id, mp3file) 
-      os.remove(file_path) 
-      os.remove(mp3file) 
-    elif (ex == ".mp4" or ex == ".mkv") :
-       await CallbackQuery.edit_message_text("جار التسريع")
-       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
-       await  bot.send_video(user_id,mp4file)
-       os.remove(file_path) 
-       os.remove(mp4file) 
+ ##########  خواص الدمج ###########
 
-  elif CallbackQuery.data == "spd2":
-    spdratevid = 0.66666666666
-    spdrateaud = 1.5
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-      await CallbackQuery.edit_message_text("جار التسريع")
-      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
-      await bot.send_audio(user_id, mp3file) 
-      os.remove(file_path) 
-      os.remove(mp3file) 
-    elif (ex == ".mp4" or ex == ".mkv") :
-       await CallbackQuery.edit_message_text("جار التسريع")
-       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
-       await  bot.send_video(user_id,mp4file)
-       os.remove(file_path) 
-       os.remove(mp4file) 
-  elif CallbackQuery.data == "spd3":
-    spdratevid = 0.57142857142
-    spdrateaud = 1.75
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-      await CallbackQuery.edit_message_text("جار التسريع")
-      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
-      await bot.send_audio(user_id, mp3file) 
-      os.remove(file_path) 
-      os.remove(mp3file) 
-    elif (ex == ".mp4" or ex == ".mkv") :
-       await CallbackQuery.edit_message_text("جار التسريع")
-       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
-       await  bot.send_video(user_id,mp4file)
-       os.remove(file_path) 
-       os.remove(mp4file) 
-  elif CallbackQuery.data == "spd4":
-    spdratevid = 0.5
-    spdrateaud = 2
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-      await CallbackQuery.edit_message_text("جار التسريع")
-      cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
-      await bot.send_audio(user_id, mp3file) 
-      os.remove(file_path) 
-      os.remove(mp3file) 
-    elif (ex == ".mp4" or ex == ".mkv") :
-       await CallbackQuery.edit_message_text("جار التسريع")
-       cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
-       await  bot.send_video(user_id,mp4file)
-       os.remove(file_path) 
-       os.remove(mp4file) 
-  
 
   elif CallbackQuery.data == "audmerge":
+    await downloadtoserver(nepho)
     if ex == ".m4a" or ex == ".mp3" or ex == ".ogg":
      await CallbackQuery.edit_message_text("جار الإضافة ")
      audmergelist.append(file_path)
@@ -1151,12 +1188,93 @@ async def _telegram_file(client, message):
       f.write(f'''file '{mp3merge}' \n''')
     cmd(f'''ffmpeg -f concat -safe 0 -i list.txt "{mp3file}" -y ''')
     await bot.send_audio(user_id, mp3file)
+    await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
     os.remove("list.txt")
     os.remove(mp3file)
     shutil.rmtree('./mergy/') 
     audmergelist.clear()
+  
+  elif CallbackQuery.data == "pdfmergenow":
+      await CallbackQuery.edit_message_text("جار الدمج")
+      pdfs = []
+      with open("pdfy.txt", "r") as file:
+       for line in file:
+        pdfs.append(line.strip())
+      merger = PdfMerger()
+      for pdf in pdfs:
+       merger.append(pdf)
+      pdfmerged = f"{filename}.pdf"
+      merger.write(pdfmerged)
+      merger.close()
+      await  bot.send_document(user_id,pdfmerged)
+      await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+      shutil.rmtree("./pdfmerge/")
+      cmd(f'''rm "{pdfmerged}" pdfy.txt''')
+      os.remove(pdfmerged);os.remove("pdfy.txt")
+
+  elif CallbackQuery.data == "imagemergenow" :
+          await CallbackQuery.edit_message_text(text = PRESS_MERGEMODE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGEMODE_IMAGE_BUTTONS))
+  elif CallbackQuery.data == "sidebyside" :
+     output_img = f"{nom}.jpg"
+     image1 = str(imagedic[0])
+     image2 = str(imagedic[1])
+     merged = merge_images2( image1, image2 )
+     merged.save(output_img) 
+     if len(imagedic) > 2 :
+        for x in range(2,len(imagedic)) :
+          image1 = output_img
+          image2 = str(imagedic[x])
+          merged = merge_images2( image1, image2 )
+          merged.save(output_img) 
+     await bot.send_document(user_id,output_img)
+     await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+     for x in range(0,len(imagedic)) :
+      os.remove(str(imagedic[x]))
+     imagedic.clear()
+     os.remove(output_img)
+
+  elif CallbackQuery.data == "updown" :
+     output_img = f"{nom}.jpg"
+     image1 = imagedic[0]
+     image2 = imagedic[1]
+     merged = merge_images1( image1, image2 )
+     merged.save(output_img) 
+     if len(imagedic) > 2 :
+        for x in range(2,len(imagedic)) :
+          image1 = output_img
+          image2 = str(imagedic[x])
+          merged = merge_images1( image1, image2 )
+          merged.save(output_img) 
+     else :
+        pass
+     await bot.send_document(user_id,output_img)
+     await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+     for x in range(0,len(imagedic)) :
+      os.remove(str(imagedic[x]))
+     imagedic.clear()
+     os.remove(output_img)
+
+  elif  CallbackQuery.data == "vidmergenow" :
+     for x in range(1,len(vidmergelist)):
+        cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "mod.mp4"''') 
+        os.rename("mod.mp4",mp4file)
+        if len(vidmergelist) > 2:
+         vidmergelist.remove(vidmergelist[0])
+         vidmergelist.remove(vidmergelist[0])
+         vidmergelist.insert(0,mp4file)
+
+     await bot.send_video(user_id,mp4file)
+     await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+     shutil.rmtree("./data/")
+     os.remove(mp4file)
+     vidmergelist.clear()
+        
+
+      ###### خاصية التقسيم #######
+
   elif CallbackQuery.data == "splitty":
-    await CallbackQuery.edit_message_text("جار التقسيم") 
+    await CallbackQuery.edit_message_text("جار التقسيم")
+    await downloadtoserver(nepho)
     cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a mod.mp3 -y''')
     cmd(f'mkdir parts')
     cmd(f'''ffmpeg -i "mod.mp3" -f segment -segment_time 300 -c copy "./parts/{nom}%09d.wav" -y''')
@@ -1194,39 +1312,26 @@ async def _telegram_file(client, message):
              os.remove(reso)
              coca += 1                                      
     await shutil.rmtree('./parts/') 
+    await CallbackQuery.edit_message_text("تم التقسيم  ✅  ")
     os.remove("mod.mp3") 
     os.remove(file_path) 
-  
-  elif CallbackQuery.data == "pdfmergenow":
-      await CallbackQuery.edit_message_text("جار الدمج")
-      pdfs = []
-      with open("pdfy.txt", "r") as file:
-       for line in file:
-        pdfs.append(line.strip())
-      merger = PdfMerger()
-      for pdf in pdfs:
-       merger.append(pdf)
-      pdfmerged = f"{filename}.pdf"
-      merger.write(pdfmerged)
-      merger.close()
-      await  bot.send_document(user_id,pdfmerged)
-      shutil.rmtree("./pdfmerge/")
-      cmd(f'''rm "{pdfmerged}" pdfy.txt''')
-      os.remove(pdfmerged);os.remove("pdfy.txt")
 
+    ########## خاصية الرفع لأرشيف
   
   elif CallbackQuery.data == "upldarch":
       if user_id==6234365091 :
+         await downloadtoserver(nepho)
          await CallbackQuery.edit_message_text("جار الرفع")
          cmd(f'''rclone copy "{file_path}" 'myarchive':"{bucketname}"''')
          os.remove(file_path)
-         await CallbackQuery.edit_message_text("تم الرفع")
+         await CallbackQuery.edit_message_text("تم الرفع  ✅  ")
       else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
-         os.remove(file_path)
 
+##### تغيير أبعاد الفيديو ######
   
   elif CallbackQuery.data == "vidasp":
+    await downloadtoserver(nepho)
     if ex == ".mp4" or ex == ".mkv":
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
     elif ex == ".png" or ex == ".jpg":
@@ -1237,70 +1342,39 @@ async def _telegram_file(client, message):
     await  CallbackQuery.edit_message_text("جار التحويل")
     cmd(f'''ffmpeg -i "{file_path}" -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=black" "{mp4file}"''')
     await bot.send_document(user_id,mp4file) 
+    await CallbackQuery.edit_message_text("تم التحويل   ✅  ")
+    os.remove(mp4file)
+    os.remove(file_path)
+
   elif CallbackQuery.data == "vidresnow169":
     await  CallbackQuery.edit_message_text("جار التحويل")
     cmd(f'''ffmpeg -i "{file_path}" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:-1:-1:color=black" "{mp4file}"''')
     await bot.send_video(user_id,mp4file) 
+    await CallbackQuery.edit_message_text("تم التحويل  ✅  ")
+    os.remove(mp4file)
+    os.remove(file_path)
+
+########### خاصية إزالة الصمت ##########
+
   elif CallbackQuery.data == "rmvsilence" :
    await  CallbackQuery.edit_message_text("جار إزالة الصمت")
+   await downloadtoserver(nepho)
    cmd(f'''ffmpeg -i "{file_path}" -af "silenceremove=start_periods=1:stop_periods=-1:start_threshold=-30dB:stop_threshold=-50dB:start_silence=2:stop_silence=2" "{mp3file}"''')
    await bot.send_audio(user_id,mp3file)
+   await CallbackQuery.edit_message_text("تمت إزالة الصمت  ✅  ")
    os.remove(file_path)
    os.remove(mp3file)
- 
-  elif CallbackQuery.data == "imagemergenow" :
-          await CallbackQuery.edit_message_text(text = PRESS_MERGEMODE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGEMODE_IMAGE_BUTTONS))
-  elif CallbackQuery.data == "sidebyside" :
-     output_img = f"{nom}.jpg"
-     image1 = str(imagedic[0])
-     image2 = str(imagedic[1])
-     merged = merge_images2( image1, image2 )
-     merged.save(output_img) 
-     if len(imagedic) > 2 :
-        for x in range(2,len(imagedic)) :
-          image1 = output_img
-          image2 = str(imagedic[x])
-          merged = merge_images2( image1, image2 )
-          merged.save(output_img) 
-     await bot.send_document(user_id,output_img)
-     for x in range(0,len(imagedic)) :
-      os.remove(str(imagedic[x]))
-     imagedic.clear()
-     os.remove(output_img)
 
-  elif CallbackQuery.data == "updown" :
-     output_img = f"{nom}.jpg"
-     image1 = imagedic[0]
-     image2 = imagedic[1]
-     merged = merge_images1( image1, image2 )
-     merged.save(output_img) 
-     if len(imagedic) > 2 :
-        for x in range(2,len(imagedic)) :
-          image1 = output_img
-          image2 = str(imagedic[x])
-          merged = merge_images1( image1, image2 )
-          merged.save(output_img) 
-     else :
-        pass
-     await bot.send_document(user_id,output_img)
-     for x in range(0,len(imagedic)) :
-      os.remove(str(imagedic[x]))
-     imagedic.clear()
-     os.remove(output_img)
+   ######## تحويل الصورة إلى gif##########
+ 
   elif CallbackQuery.data == "imagetogif" :
       await replo.delete()
       await nepho.reply_text("الآن أرسل مدة الفيديو بالثانية بهذه الصورة \n t=المدة",reply_markup=ForceReply(True))
+
+      ######### ترجمة + فيديو ############
   
-  elif CallbackQuery.data == "convnow" :
-    pdffile = f"{nom}.pdf"
-    imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
-    await bot.send_document(user_id,pdffile)
-    os.remove(pdffile)
-    for x in range(0,len(imagepdfdic1)) :
-      os.remove(str(imagepdfdic1[x]))
-    imagepdfdic1.clear()
-    imagepdfdic.clear()
   elif CallbackQuery.data == "vidsrt" :
+     await downloadtoserver(nepho)
      if (len(vidsrt) == 0 or len(vidsrt) > 2 ) and (ex == ".ass" or ex == ".srt") :
         vidsrt.clear()
         vidsrt.append(file_path)
@@ -1315,6 +1389,7 @@ async def _telegram_file(client, message):
         vidfile = file_path
         cmd(f'''ffmpeg -i "{vidfile}" -filter_complex subtitles='{subfile}' -c:a copy "{mp4file}"''')
         await bot.send_video(user_id,mp4file)
+        await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
         os.remove(subfile)
         os.remove(vidfile)
         os.remove(mp4file)
@@ -1324,60 +1399,16 @@ async def _telegram_file(client, message):
         vidfile = vidsrt[0]
         cmd(f'''ffmpeg -i "{vidfile}" -filter_complex subtitles='{subfile}' -c:a copy "{mp4file}"''')
         await bot.send_video(user_id,mp4file)
+        await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
         os.remove(subfile)
         os.remove(vidfile)
         os.remove(mp4file)
         vidsrt.clear()
-
-  elif CallbackQuery.data == "normaltrim" :
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
-       await CallbackQuery.edit_message_text("جار القص")  
-       cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "trim{mp3file}" -y ''')
-       cmd(f'''ffmpeg -i "trim{mp3file}" -ss {strt_point} -to {end_point} -c copy "{mp3file}" -y ''')
-       await  bot.send_audio(user_id, mp3file)
-       os.remove(file_path) 
-       os.remove(mp3file) 
-       os.remove(f"trim{mp3file}")
-    elif (ex == ".mp4" or ex == ".mkv") :
-      await CallbackQuery.edit_message_text("جار القص")  
-      cmd(f'''ffmpeg -i "{file_path}" -ss {strt_point} -strict -2 -to {end_point} -c:a aac -codec:v h264 -b:v 1000k "{mp4file}" -y ''')
-      await bot.send_video(user_id, mp4file)   
-      os.remove(file_path) 
-      os.remove(mp4file) 
-  elif CallbackQuery.data == "reversetrim" :
-     starsec = re.split(':',strt_point)
-     if len(starsec) == 3 :
-        strtseconds = int(starsec[0])*60*60 + int(starsec[1])*60 + int(starsec[2])
-     elif len(starsec) == 2 : 
-         strtseconds = int(starsec[0])*60 + int(starsec[1])
-     elif len(starsec) == 1 : 
-        strtseconds =  int(starsec[0])
-     endsec = re.split(':',end_point)
-     if len(endsec) == 3 :
-        endseconds = int(endsec[0])*60*60 + int(endsec[1])*60 + int(endsec[2])
-     elif len(endsec) == 2 : 
-         endseconds = int(endsec[0])*60 + int(endsec[1])
-     elif len(endsec) == 1 : 
-        endseconds =  int(endsec[0])
-     cmd(f'''ffmpeg -i "{file_path}" -af "aselect='not(between(t,{strtseconds},{endseconds}))'" "{mp3file}"''')
-     await bot.send_audio(user_id,mp3file)
-     os.remove(mp3file)
-     os.remove(file_path)
   
-  elif  CallbackQuery.data == "vidmergenow" :
-     for x in range(1,len(vidmergelist)):
-        cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "mod.mp4"''') 
-        os.rename("mod.mp4",mp4file)
-        if len(vidmergelist) > 2:
-         vidmergelist.remove(vidmergelist[0])
-         vidmergelist.remove(vidmergelist[0])
-         vidmergelist.insert(0,mp4file)
+  
+  ######### خاصية عكس الـpdf  #########
 
-     await bot.send_video(user_id,mp4file)
-     shutil.rmtree("./data/")
-     os.remove(mp4file)
-     vidmergelist.clear()
-        
+  
   elif  CallbackQuery.data == "reversepdf" :
     await CallbackQuery.edit_message_text("جار العكس")
     cmd('mkdir rvtemp')
@@ -1408,11 +1439,16 @@ async def _telegram_file(client, message):
     pdffile = f"{nom}.pdf"
     imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
     await bot.send_document(user_id,pdffile)
+    await CallbackQuery.edit_message_text("تم العكس  ✅  ")
     os.remove(pdffile)
     shutil.rmtree("./rvtemp/")
     imagepdfdic.clear()
     rpdfpage.clear()
+
+    ############  خاصية الأرشفة ######## 
+
   elif  CallbackQuery.data == "zipfile" :
+    await downloadtoserver(nepho)
     cmd('mkdir zipdir')
     mergeviditem = f"./zipdir/{filename}"
     os.rename(file_path,mergeviditem)
@@ -1421,15 +1457,15 @@ async def _telegram_file(client, message):
     zipfile = f"{nom}.zip"
     shutil.make_archive(nom, 'zip', './zipdir/')
     await bot.send_document(user_id,zipfile)
+    await CallbackQuery.edit_message_text("تمت الأرشفة  ✅  ")
     os.remove(zipfile)
     shutil.rmtree("./zipdir/")
-  elif  CallbackQuery.data == "vidcomp" :
-    #cmd(f'''ffmpeg -i "{file_path}" -vcodec libx265 -crf 28 "{mp4file}"''')
-    cmd(f'''ffmpeg -y -i "{file_path}" -vf "setpts=1*PTS" -r 10 "{mp4file}"''')
-    await bot.send_video(user_id,mp4file)
-    os.remove(mp4file)
-    os.remove(file_path)
+
+
+    ############خواص الاستخراج ###########
+
   elif  CallbackQuery.data == "unzip" :
+   await downloadtoserver(nepho)
    unzippath = "./unzipprocess/"
    cmd(f'mkdir "{unzippath}"')
    if ex == ".zip":
@@ -1470,8 +1506,14 @@ async def _telegram_file(client, message):
       sentfile = f"{unzippath}{images[x]}"
       await bot.send_document(user_id,sentfile)
     shutil.rmtree(unzippath)
+
+   await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+
+    ############ خاصية الرفع ليوتيوب ###########
+
   elif  CallbackQuery.data == "upldtout" :
     if user_id==6234365091 :
+         await downloadtoserver(nepho)
          videoupldtitle = nepho.caption
          upload = Uploader(file_path,videoupldtitle )
          snt = await CallbackQuery.edit_message_text("جار الرفع")
@@ -1480,7 +1522,6 @@ async def _telegram_file(client, message):
          os.remove(file_path)
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
-         os.remove(file_path)
 
     
  
@@ -1508,8 +1549,9 @@ async def refunc(client,message):
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
           endstart = message.text 
+          tempid = message.from_user.id
           msgid = message.reply_to_message_id
-          await bot.delete_messages(user_id,msgid)
+          await bot.delete_messages(tempid,msgid)
           await message.delete()
           global strt_point
           global end_point
@@ -1519,6 +1561,7 @@ async def refunc(client,message):
 @bot.on_message(filters.private & filters.reply & filters.regex("-"))
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
+          await downloadtoserver(nepho)
           pstartpend = message.text 
           msgid = message.reply_to_message_id
           await bot.delete_messages(user_id,msgid)
@@ -1545,6 +1588,7 @@ async def refunc(client,message):
 async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
           newname = message.text 
+          await downloadtoserver(nepho)
           msgid = message.reply_to_message_id
           await bot.delete_messages(user_id,msgid)
           await message.delete()
