@@ -949,6 +949,7 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "voicy":  
     await CallbackQuery.edit_message_text("جار تغيير الصوت ") 
+    await downloadtoserver(nepho)
     if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" :
      cmd(f'''ffmpeg -i "{file_path}" -af asetrate=44100*0.75,aresample=44100,atempo=4/3 "{mp3file}"''')
      await bot.send_audio(user_id, mp3file)
@@ -957,7 +958,6 @@ async def _telegram_file(client, message):
        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id,mp4file)
        os.remove(mp4file)
-
     await CallbackQuery.edit_message_text("تم تحويل الصوت ✅  ") 
     os.remove(file_path) 
     os.remove(mp3file) 
