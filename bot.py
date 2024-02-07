@@ -1372,7 +1372,7 @@ async def _telegram_file(client, message):
     ########## خاصية الرفع لأرشيف
   
   elif CallbackQuery.data == "upldarch":
-      if user_id==6234365091 :
+      if message.from_user.id==6234365091 :
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
          await CallbackQuery.edit_message_text("جار الرفع")
@@ -1574,7 +1574,7 @@ async def _telegram_file(client, message):
     ############ خاصية الرفع ليوتيوب ###########
 
   elif  CallbackQuery.data == "upldtout" :
-    if user_id==6234365091 :
+    if message.from_user.id ==6234365091 :
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
          videoupldtitle = nepho.caption
