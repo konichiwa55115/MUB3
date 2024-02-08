@@ -1588,8 +1588,8 @@ async def _telegram_file(client, message):
     queeq.clear()
     
 
-@bot.on_message(filters.private & filters.reply & filters.regex("="))
-async def refunc(client,message):
+ @bot.on_message(filters.private & filters.reply & filters.regex("="))
+ async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
           timeofvidstoned = message.text 
           msgid = message.reply_to_message_id
@@ -1605,8 +1605,8 @@ async def refunc(client,message):
           os.remove(file_path)
           queeq.clear()
 
-@bot.on_message(filters.private & filters.reply & filters.regex('/'))
-async def refunc(client,message):
+ @bot.on_message(filters.private & filters.reply & filters.regex('/'))
+ async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
           endstart = message.text 
           tempid = message.from_user.id
@@ -1619,8 +1619,8 @@ async def refunc(client,message):
           end_point = end
           await message.reply(text = CHOOSE_UR_TRIMMODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_TRIMMODE_BUTTONS))
           queeq.clear()
-@bot.on_message(filters.private & filters.reply & filters.regex("-"))
-async def refunc(client,message):
+ @bot.on_message(filters.private & filters.reply & filters.regex("-"))
+ async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
           await downloadtoserver(nepho)
           pstartpend = message.text 
@@ -1646,8 +1646,8 @@ async def refunc(client,message):
           os.remove(file_path) 
           os.remove(filename)
           queeq.clear()
-@bot.on_message(filters.private & filters.reply )
-async def refunc(client,message):
+ @bot.on_message(filters.private & filters.reply )
+ async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
           newname = message.text 
           await downloadtoserver(nepho)
