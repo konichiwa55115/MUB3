@@ -752,6 +752,9 @@ def command2(bot,message):
     audmergelist.clear()
     vidmergelist.clear()
 
+
+    ########### الوظائف الرئيسية ###########
+
 @bot.on_message(filters.private & filters.incoming & filters.voice | filters.audio | filters.video | filters.document | filters.photo | filters.animation )
 async def _telegram_file(client, message):
  if len(queeq) == 0 : 
@@ -762,8 +765,8 @@ async def _telegram_file(client, message):
     pass
  queeq.append(message.from_user.id)
  global  replo,nepho
- replo = await message.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
  nepho = message
+ replo = await nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
  
  @bot.on_callback_query()
  async def callback_query(CLIENT,CallbackQuery): 
@@ -1089,7 +1092,7 @@ async def _telegram_file(client, message):
 
   elif CallbackQuery.data == "renm":
     await replo.delete()
-    await message.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
+    await nepho.reply_text("الآن أدخل الاسم الجديد ",reply_markup=ForceReply(True))
 
  ########## خاصية التفريغ  ###########
   
@@ -1199,11 +1202,13 @@ async def _telegram_file(client, message):
 
 
   elif CallbackQuery.data == "audmerge":
-    await CallbackQuery.edit_message_text("معالجة ⏱️")
+    await CallbackQuery.edit_message_text("معالجة ⏱")
     await downloadtoserver(nepho)
     if ex == ".m4a" or ex == ".mp3" or ex == ".ogg":
      await CallbackQuery.edit_message_text("جار الإضافة ")
-     audmergelist.append(file_path)
+     tempmp3 = f"{random.randint(1,1000)}{ex}"
+     os.replace(file_path,tempmp3)
+     audmergelist.append(tempmp3)
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
     elif ex == ".mp4" or ex == ".mkv" : 
      cmd('mkdir data')
@@ -1227,7 +1232,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("جار الدمج") 
     cmd(f'''mkdir mergy''')
     for x in range(0,len(audmergelist)) :
-     mp3merge = f"{nom}{random.randint(0,100)}.mp3"
+     mp3merge = f"{random.randint(0,1000)}.mp3"
      cmd(f'''ffmpeg -i "{audmergelist[x]}" -q:a 0 -map a "{mp3merge}" -y ''')
      os.remove(audmergelist[x])
      with open('list.txt','a') as f:
@@ -1372,7 +1377,7 @@ async def _telegram_file(client, message):
     ########## خاصية الرفع لأرشيف
   
   elif CallbackQuery.data == "upldarch":
-      if message.from_user.id==6234365091 :
+      if nepho.from_user.id==6234365091 :
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
          await CallbackQuery.edit_message_text("جار الرفع")
@@ -1574,7 +1579,7 @@ async def _telegram_file(client, message):
     ############ خاصية الرفع ليوتيوب ###########
 
   elif  CallbackQuery.data == "upldtout" :
-    if message.from_user.id ==6234365091 :
+    if nepho.from_user.id ==6234365091 :
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
          videoupldtitle = nepho.caption
