@@ -8,6 +8,7 @@ vidsrt = []
 audmergelist = []
 vidmergelist = []
 queeq = []   
+imageforms = [".jpg",".png"]
 temptxt = "res.txt"
 from oauth2client.file import Storage
 from httplib2 import HttpLib2Error
@@ -55,6 +56,80 @@ bot = Client(
 #6709809460:AAGWWXJBNMF_4ohBNRS22Tg0Q3-vkm376Eo
 #6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
+async def Coloringfunc(y):
+   color = y
+   if ex in imageforms :
+      imgfile = f"{nom}.jpg"
+      if color == "g" : 
+       cmd(f'''sh color2gray -f rms "{file_path}" "{imgfile}" ''')
+      elif color == "y" :
+         cmd (f'''sh coloration -h 60 -s 50 -l 0 "{file_path}" "{imgfile}" '''  )
+      elif color == "b":
+          cmd (f'''sh coloration -h 180 -s 50 -l 0 "{file_path}" "{imgfile}" '''  )
+      elif color == "r":
+          cmd (f'''sh coloration -h 0 -s 50 -l 0 "{file_path}" "{imgfile}" '''  )
+      elif color == "p":
+         cmd (f'''sh coloration -h 330 -s 50 -l 0 "{file_path}" "{imgfile}" '''  )
+      await bot.send_photo(user_id,imgfile)
+      os.remove(file_path)
+      os.remove(imgfile)
+   elif ex == ".pdf":
+    cmd('mkdir rvtemp')
+    cmd('mkdir grtemp')
+    pdf = pdfium.PdfDocument(file_path)
+    n_pages = len(pdf)
+    if color == "g":
+     for page_number in range(n_pages):
+      page = pdf.get_page(page_number)
+      pil_image = page.render_topil(
+        scale=1,
+        rotation=0,
+        crop=(0, 0, 0, 0),
+        colour=(255, 255, 255, 255),
+        annotations=True,
+        greyscale=True,
+        optimise_mode=pdfium.OptimiseMode.NONE,)
+      pil_image.save(f"./rvtemp/image_{page_number+1}.png")
+     os.remove(file_path)
+    else : 
+       for page_number in range(n_pages):
+        page = pdf.get_page(page_number)
+        pil_image = page.render_topil(
+         scale=1,
+         rotation=0,
+         crop=(0, 0, 0, 0),
+         colour=(255, 255, 255, 255),
+         annotations=True,
+         greyscale=False,
+         optimise_mode=pdfium.OptimiseMode.NONE,)
+        pil_image.save(f"./rvtemp/image_{page_number+1}.png")
+       os.remove(file_path)
+    for x in range(1,n_pages+1): 
+      if color == "g":
+       os.rename(f"./rvtemp/image_{x}.png",f"./grtemp/image_{x}.png")  
+      elif color == "y" :
+         cmd (f'''sh coloration -h 60 -s 50 -l 0 "./rvtemp/image_{x}.png" "./grtemp/image_{x}.png" '''  )
+      elif color == "b":
+          cmd (f'''sh coloration -h 180 -s 50 -l 0 "./rvtemp/image_{x}.png" "./grtemp/image_{x}.png" '''  )
+      elif color == "r":
+          cmd (f'''sh coloration -h 0 -s 50 -l 0 "./rvtemp/image_{x}.png" "./grtemp/image_{x}.png" '''  )
+      elif color == "p":
+         cmd (f'''sh coloration -h 330 -s 50 -l 0 "./rvtemp/image_{x}.png" "./grtemp/image_{x}.png" '''  )
+      imagepdfdic1.append(f"./grtemp/image_{x}.png")
+      imagey = Image.open(imagepdfdic1[0]).convert('RGB')  
+                  
+    if len(imagepdfdic1) > 1 :
+       for x in range(1,len(imagepdfdic1)):
+        image2 = Image.open(imagepdfdic1[x]).convert('RGB')
+        imagepdfdic.append(image2)
+    pdffile = f"{nom}.pdf"
+    imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
+    await bot.send_document(user_id,pdffile)
+    os.remove(pdffile)
+    shutil.rmtree("./rvtemp/")
+    shutil.rmtree("./grtemp/")
+    imagepdfdic1.clear()
+    imagepdfdic.clear()
 
 @bot.on_message(filters.command('apiswitch1') & filters.private)
 def command2(bot,message):
@@ -474,7 +549,8 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("تسريع ",callback_data="speedy"),InlineKeyboardButton("تحويل ",callback_data="conv"),InlineKeyboardButton("تفريغ ",callback_data="transcribe")], 
     [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm")],
     [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
-    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("الرفع ليوتيوب",callback_data="upldtout")],
+    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("تلوين",callback_data="coloring")],
+[InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("الرفع ليوتيوب",callback_data="upldtout")],
     [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip")],
     [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير الأبعاد  ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
     [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")]
@@ -485,6 +561,16 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
 PRESS_MERGE_IMAGE = "الآن أرسل الصورة الأخرى و اختر دمج الآن "
 PRESS_MERGE_IMAGE_BUTTONS = [
     [InlineKeyboardButton("دمج الآن ",callback_data="imagemergenow")]
+     ]
+
+YOUR_COLOR_MODE = "اختر نمط التلوين"
+YOUR_COLOR_MODE_BUTTONS = [
+    [InlineKeyboardButton("رمادي",callback_data="Grayscale")],
+    [InlineKeyboardButton("أحمر",callback_data="red")],
+    [InlineKeyboardButton("أخضر",callback_data="green")],
+    [InlineKeyboardButton("أصفر",callback_data="yellow")],
+    [InlineKeyboardButton("أزرق فاتح",callback_data="whiteblue")],
+    [InlineKeyboardButton("أرجواني",callback_data="purple")]
      ]
 PRESS_ZIP_FILE = "بعد الانتهاء من إرسال الملفات , اضغط تحويل الآن "
 PRESS_ZIP_FILE_BUTTONS = [
@@ -1476,6 +1562,7 @@ async def _telegram_file(client, message):
   
   elif  CallbackQuery.data == "reversepdf" :
     await CallbackQuery.edit_message_text("جار العكس")
+    await downloadtoserver(nepho)
     cmd('mkdir rvtemp')
     pdf = pdfium.PdfDocument(f'{file_path}')
     n_pages = len(pdf)
@@ -1509,6 +1596,42 @@ async def _telegram_file(client, message):
     imagepdfdic.clear()
     rpdfpage.clear()
     queeq.clear()
+  elif  CallbackQuery.data == "coloring" :
+   await CallbackQuery.edit_message_text(text = YOUR_COLOR_MODE,reply_markup = InlineKeyboardMarkup(YOUR_COLOR_MODE_BUTTONS))
+
+  elif  CallbackQuery.data == "Grayscale" :
+   await CallbackQuery.edit_message_text("جار التلوين")
+   await downloadtoserver(nepho)
+   await Coloringfunc("g")
+   await CallbackQuery.edit_message_text("تم التلوين ✅  ") 
+   queeq.clear()
+  elif  CallbackQuery.data == "red" :
+   await CallbackQuery.edit_message_text("جار التلوين")
+   await downloadtoserver(nepho)
+   await Coloringfunc("r")
+   await CallbackQuery.edit_message_text("تم التلوين ✅  ") 
+   queeq.clear()
+  elif  CallbackQuery.data == "yellow" :
+   await CallbackQuery.edit_message_text("جار التلوين")
+   await downloadtoserver(nepho)
+   await Coloringfunc("y")
+   await CallbackQuery.edit_message_text("تم التلوين ✅  ") 
+   queeq.clear()
+  elif  CallbackQuery.data == "purple" :
+   await CallbackQuery.edit_message_text("جار التلوين")
+   await downloadtoserver(nepho)
+   await Coloringfunc("p")
+   await CallbackQuery.edit_message_text("تم التلوين ✅  ") 
+   queeq.clear()
+  elif  CallbackQuery.data == "whiteblue" :
+   await CallbackQuery.edit_message_text("جار التلوين")
+   await downloadtoserver(nepho)
+   await Coloringfunc("b")
+   await CallbackQuery.edit_message_text("تم التلوين ✅  ") 
+   queeq.clear()
+
+
+
 
     ############  خاصية الأرشفة ######## 
 
