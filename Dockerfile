@@ -14,6 +14,8 @@ RUN apt install dos2unix -y
 RUN apt install tesseract-ocr -y
 RUN apt-get install yasm libvpx. libx264. -y
 CMD ["/bin/chmod", "+x" , "textcleaner"]
+CMD ["/bin/chmod", "+x" , "color2gray"]
+CMD ["/bin/chmod", "+x" , "coloration"]
 
 
 # Updating Pip Packages
