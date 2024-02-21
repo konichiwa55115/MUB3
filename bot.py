@@ -13,6 +13,8 @@ imageforms = [".jpg",".png"]
 audioforms = [".mp3",".ogg",".m4a"]
 videoforms = [".mp4",".mkv"]
 temptxt = "res.txt"
+import tika
+from tika import parser
 from oauth2client.file import Storage
 from httplib2 import HttpLib2Error
 from oauth2client.client import (
@@ -1694,11 +1696,11 @@ async def _telegram_file(client, message):
     ############خواص الاستخراج ###########
 
   elif  CallbackQuery.data == "unzip" :
-   await CallbackQuery.edit_message_text("معالجة ⏱️")
+   await CallbackQuery.edit_message_text("جار الاستخراج ⏱️")
    await downloadtoserver(nepho)
    unzippath = "./unzipprocess/"
    cmd(f'mkdir "{unzippath}"')
-   if exo == ".zip":
+   if ex == ".zip":
      with ZipFile(file_path, 'r') as zObject: 
       zObject.extractall(path=unzippath) 
      files = os.listdir(unzippath)
@@ -1715,7 +1717,7 @@ async def _telegram_file(client, message):
       else :
           await bot.send_document(user_id,sentfile)
      shutil.rmtree(unzippath)  
-   elif exo == ".pdf":
+   elif ex == ".pdf":
     pdf = pdfium.PdfDocument(f'{file_path}')
     n_pages = len(pdf)
     for page_number in range(n_pages):
@@ -1736,6 +1738,16 @@ async def _telegram_file(client, message):
       sentfile = f"{unzippath}{images[x]}"
       await bot.send_document(user_id,sentfile)
     shutil.rmtree(unzippath)
+   elif ex == ".epub":
+       parsed = parser.from_file(file_path)
+       textfile = f"{nom}.txt"
+       finaltext = parsed['content'].replace('\n',' ')
+       with open(textfile, "a") as f:     
+        f.write(f" {finaltext} ")
+       await bot.send_document(user_id,textfile)
+       os.remove(textfile)
+       os.remove(file_path)
+      
    await CallbackQuery.edit_message_text("تم الاستخراج  ✅  ")
    queeq.clear()
 
