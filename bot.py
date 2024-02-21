@@ -7,8 +7,11 @@ imagepdfdic1 = []
 vidsrt = []
 audmergelist = []
 vidmergelist = []
+pdfqueemerge = []
 queeq = []   
 imageforms = [".jpg",".png"]
+audioforms = [".mp3",".ogg",".m4a"]
+videoforms = [".mp4",".mkv"]
 temptxt = "res.txt"
 from oauth2client.file import Storage
 from httplib2 import HttpLib2Error
@@ -58,7 +61,7 @@ bot = Client(
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
 async def Coloringfunc(y):
    color = y
-   if ex in imageforms :
+   if exo in imageforms :
       imgfile = f"{nom}.jpg"
       if color == "g" : 
        cmd(f'''sh color2gray -f rms "{file_path}" "{imgfile}" ''')
@@ -73,7 +76,7 @@ async def Coloringfunc(y):
       await bot.send_photo(user_id,imgfile)
       os.remove(file_path)
       os.remove(imgfile)
-   elif ex == ".pdf":
+   elif exo == ".pdf":
     cmd('mkdir rvtemp')
     cmd('mkdir grtemp')
     pdf = pdfium.PdfDocument(file_path)
@@ -472,45 +475,47 @@ async def downloadtoserver(x):
  trimdir = f"./trimmo/{mp3file}"
  result = f"{nom}.txt" 
 async def compressaud(rate):
+    await downloadtoserver(nepho)
     cmd(f''' ffmpeg -i "{file_path}" -b:a "{rate}" "{mp3file}" -y ''' )
     await bot.send_audio(user_id, mp3file)
     os.remove(file_path) 
     os.remove(mp3file) 
 async def amplify(amplemode):
- if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+ if exo in audioforms :
         cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
         await bot.send_audio(user_id, mp3file)
         os.remove(file_path) 
         os.remove(mp3file) 
- elif (ex == ".mp4" or ex == ".mkv") :
+ elif exo in videoforms :
         cmd(f'''ffmpeg -i "{file_path}" -filter:a volume={amplemode}dB "{mp3file}"''')
         cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{filename}"''')
         await bot.send_video(user_id, filename) 
         os.remove(file_path) 
         os.remove(filename) 
 async def convy(k):
-   if k == m4afile :
+   await downloadtoserver(nepho)
+   if k == "m4afile" :
        cmd(f'''ffmpeg -i "{file_path}" -c:a aac -b:a 192k "{m4afile}" -y ''')
        await bot.send_audio(user_id, m4afile)
        os.remove(file_path) 
        os.remove(m4afile) 
-   elif k == mp3file :
+   elif k == "mp3file" :
       cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
       await  bot.send_audio(user_id, mp3file)
       os.remove(file_path) 
       os.remove(mp3file)
-   elif k == mp4file :
+   elif k == "mp4file" :
       cmd(f'''ffmpeg -i "{file_path}" -codec copy "{mp4file}" -y ''')
       await bot.send_video(user_id, mp4file)
       os.remove(file_path) 
       os.remove(mp4file) 
 async def spoody(spdrateaud,spdratevid):
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+    if exo in audioforms :
       cmd(f'''ffmpeg -i "{file_path}" -filter:a "atempo={spdrateaud}" -vn "{mp3file}" -y ''')
       await bot.send_audio(user_id, mp3file) 
       os.remove(file_path) 
       os.remove(mp3file) 
-    elif (ex == ".mp4" or ex == ".mkv") :
+    elif exo in videoforms :
        cmd(f'''ffmpeg -i "{file_path}" -filter_complex "[0:v]setpts={spdratevid}*PTS[v];[0:a]atempo={spdrateaud}[a]" -map "[v]" -map "[a]" "{mp4file}" -y ''')
        await  bot.send_video(user_id,mp4file)
        os.remove(file_path) 
@@ -850,8 +855,24 @@ async def _telegram_file(client, message):
     queeq.clear()
     pass
  queeq.append(message.from_user.id)
- global  replo,nepho
+ global  replo,nepho,temponame,nomo,exo
  nepho = message
+ #print(nepho)
+ if nepho.photo :
+  nomo = nepho.photo.file_unique_id
+  exo = ".jpg"
+ elif nepho.voice :
+  nomo = nepho.voice.file_unique_id
+  exo = ".ogg"
+ elif nepho.audio : 
+  temponame = nepho.audio.file_name
+  nomo,exo = os.path.splitext(temponame)
+ elif nepho.video : 
+  nomo = nepho.video.file_unique_id
+  exo = ".mp4"
+ elif nepho.document  : 
+  temponame = nepho.document.file_name
+  nomo,exo = os.path.splitext(temponame)
  replo = await nepho.reply(text = CHOOSE_UR_AUDIO_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_AUDIO_MODE_BUTTONS))
  
  @bot.on_callback_query()
@@ -903,8 +924,8 @@ async def _telegram_file(client, message):
   
   elif CallbackQuery.data == "comp":
    await CallbackQuery.edit_message_text("معالجة ⏱️")
-   await downloadtoserver(nepho)
-   if ex == ".pdf":
+   if exo == ".pdf":
+      await downloadtoserver(nepho)
       await CallbackQuery.edit_message_text("جار الضغط")
       PDFNet.Initialize("demo:1676040759361:7d2a298a03000000006027df7c81c9e05abce088e7286e8312e5e06886"); doc = PDFDoc(f"{file_path}")
       doc.InitSecurityHandler()
@@ -916,14 +937,15 @@ async def _telegram_file(client, message):
       os.remove(file_path) 
       os.remove(filename)
       queeq.clear() 
-   elif ex == ".mkv" or ex == ".mp4":
+   elif exo in videoforms:
+    await downloadtoserver(nepho)
     cmd(f'''ffmpeg -y -i "{file_path}" -vf "setpts=1*PTS" -r 10 "{mp4file}"''')
     await bot.send_video(user_id,mp4file)
     await CallbackQuery.edit_message_text("تم الضغط ✅  ")   
     os.remove(mp4file)
     os.remove(file_path)
     queeq.clear()
-   elif ex == ".mp3" or ex == ".m4a" or ex == ".ogg":
+   elif exo in audioforms:
     await CallbackQuery.edit_message_text(text = CHOOSE_UR_COMP_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_COMP_MODE_BUTTONS) )
   elif  CallbackQuery.data == "compmod1":
     await CallbackQuery.edit_message_text("جار الضغط ") 
@@ -990,8 +1012,8 @@ async def _telegram_file(client, message):
 
   elif CallbackQuery.data == "conv" :
     await CallbackQuery.edit_message_text("معالجة ⏱️")
-    await downloadtoserver(nepho)
-    if ex == ".jpg" or ex == ".png" :
+    if exo in imageforms :
+      await downloadtoserver(nepho)
       imagepdfdic1.append(file_path)
       global imagey
       imagey = Image.open(imagepdfdic1[0]).convert('RGB')
@@ -1004,19 +1026,19 @@ async def _telegram_file(client, message):
     queeq.clear() 
   elif CallbackQuery.data == "audconv" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
-   await convy(mp3file)
+   await convy("mp3file")
    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
    queeq.clear()
 
   elif CallbackQuery.data == "audconvm4a" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
-   await convy(m4afile)
+   await convy("m4afile")
    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
    queeq.clear()
    
   elif CallbackQuery.data == "vidconv" :
    await CallbackQuery.edit_message_text("جار التحويل ") 
-   await convy(mp4file)
+   await convy("mp4file")
    await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
    queeq.clear()
 
@@ -1038,11 +1060,12 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "voicy":  
     await CallbackQuery.edit_message_text("جار تغيير الصوت ") 
-    await downloadtoserver(nepho)
-    if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" :
+    if exo in audioforms :
+     await downloadtoserver(nepho)
      cmd(f'''ffmpeg -i "{file_path}" -af asetrate=44100*0.75,aresample=44100,atempo=4/3 "{mp3file}"''')
      await bot.send_audio(user_id, mp3file)
-    elif ex == ".mp4" or ex == ".mkv" :
+    elif exo in videoforms :
+       await downloadtoserver(nepho)
        cmd(f'''ffmpeg -i "{file_path}" -af asetrate=44100*0.75,aresample=44100,atempo=4/3 "{mp3file}"''')
        cmd(f'''ffmpeg -i "{file_path}" -i "{mp3file}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id,mp4file)
@@ -1057,11 +1080,12 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "subs":
       await CallbackQuery.edit_message_text("معالجة ⏱️")
-      await downloadtoserver(nepho)
-      if (ex == ".mp4" or ex == ".mkv") and len(vidsubslist) == 0 :
+      if exo in videoforms and len(vidsubslist) == 0 :
+         await downloadtoserver(nepho)
          vidsubslist.append(file_path)
          await CallbackQuery.edit_message_text("الآن أرسل الصوتية")
-      elif (ex == ".mp4" or ex == ".mkv") and len(vidsubslist) == 1 :
+      elif exo in videoforms and len(vidsubslist) == 1 :
+       await downloadtoserver(nepho)
        await CallbackQuery.edit_message_text("جار الإبدال ") 
        cmd(f'''ffmpeg -i "{file_path}" -i "{vidsubslist[0]}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id, mp4file)
@@ -1070,10 +1094,12 @@ async def _telegram_file(client, message):
        os.remove(mp4file) 
        os.remove(vidsubslist[0]) 
        vidsubslist.clear()
-      elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(vidsubslist) == 0 :
+      elif exo in audioforms and len(vidsubslist) == 0 :
+        await downloadtoserver(nepho)
         vidsubslist.append(file_path)
         await CallbackQuery.edit_message_text("الآن أرسل الفيديو")
-      elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(vidsubslist) == 1 :
+      elif exo in audioforms and len(vidsubslist) == 1 :
+       await downloadtoserver(nepho)
        await CallbackQuery.edit_message_text("جار الإبدال ") 
        cmd(f'''ffmpeg -i "{vidsubslist[0]}" -i "{file_path}" -c:v copy -map 0:v:0 -map 1:a:0 "{mp4file}"''')
        await bot.send_video(user_id, mp4file)
@@ -1089,12 +1115,13 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "imagetovid":
      await CallbackQuery.edit_message_text("معالجة ⏱️")
-     await downloadtoserver(nepho)
-     if (ex == ".png" or ex == ".jpg") and len(montaglist) == 0 :
+     if (exo in imageforms) and len(montaglist) == 0 :
+      await downloadtoserver(nepho)
       montaglist.append(file_path)
       await CallbackQuery.edit_message_text("الآن أرسل الصوتية") 
-     elif (ex == ".png" or ex == ".jpg") and len(montaglist) == 1 :
+     elif (exo in imageforms) and len(montaglist) == 1 :
       await CallbackQuery.edit_message_text("جار المنتجة") 
+      await downloadtoserver(nepho)
       cmd(f'''ffmpeg -i "{montaglist[0]}" -q:a 0 -map a "{mp3file}" -y ''')
       cmd(f'''ffmpeg -r 1 -loop 1 -y -i  "{file_path}" -i "{mp3file}" -c:v libx264 -tune stillimage -c:a copy -shortest -vf scale=1920:1080 "{mp4file}"''')
       await bot.send_video(user_id, mp4file)
@@ -1104,11 +1131,13 @@ async def _telegram_file(client, message):
       os.remove(mp3file) 
       os.remove(montaglist[0]) 
       montaglist.clear()
-     elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(montaglist) == 0 :
+     elif exo in audioforms and len(montaglist) == 0 :
+      await downloadtoserver(nepho)
       montaglist.append(file_path)
       await CallbackQuery.edit_message_text("الآن أرسل الصورة") 
-     elif (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") and len(montaglist) == 1 :
+     elif exo in audioforms and len(montaglist) == 1 :
       await CallbackQuery.edit_message_text("جار المنتجة") 
+      await downloadtoserver(nepho)
       cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "{mp3file}" -y ''')
       cmd(f'''ffmpeg -r 1 -loop 1 -y -i  "{montaglist[0]}" -i "{mp3file}" -c:v libx264 -tune stillimage -c:a copy -shortest -vf scale=1920:1080 "{mp4file}"''')
       await bot.send_video(user_id, mp4file)
@@ -1126,15 +1155,15 @@ async def _telegram_file(client, message):
 
   elif CallbackQuery.data == "trim" :
     await CallbackQuery.edit_message_text("معالجة ⏱️")
-    await downloadtoserver(nepho)
     await replo.delete()
-    if ex == ".pdf":
+    if exo == ".pdf":
       await nepho.reply_text(" الآن أرسل نقطة البداية والنهاية بهذه الصورة \n start-end ",reply_markup=ForceReply(True))
     else :
       await nepho.reply_text("الآن أرسل نقطة البداية والنهاية بهذه الصورة \n\n hh:mm:ss/hh:mm:ss",reply_markup=ForceReply(True))
   elif CallbackQuery.data == "normaltrim" :
-    if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+    if exo in audioforms :
        await CallbackQuery.edit_message_text("جار القص")  
+       await downloadtoserver(nepho)
        cmd(f'''ffmpeg -i "{file_path}" -q:a 0 -map a "trim{mp3file}" -y ''')
        cmd(f'''ffmpeg -i "trim{mp3file}" -ss {strt_point} -to {end_point} -c copy "{mp3file}" -y ''')
        await  bot.send_audio(user_id, mp3file)
@@ -1142,8 +1171,9 @@ async def _telegram_file(client, message):
        os.remove(file_path) 
        os.remove(mp3file) 
        os.remove(f"trim{mp3file}")
-    elif (ex == ".mp4" or ex == ".mkv") :
+    elif exo in videoforms :
       await CallbackQuery.edit_message_text("جار القص")  
+      await downloadtoserver(nepho)
       cmd(f'''ffmpeg -i "{file_path}" -ss {strt_point} -strict -2 -to {end_point} -c:a aac -codec:v h264 -b:v 1000k "{mp4file}" -y ''')
       await bot.send_video(user_id, mp4file)  
       await CallbackQuery.edit_message_text("تم القص  ✅  ") 
@@ -1152,6 +1182,7 @@ async def _telegram_file(client, message):
     queeq.clear()
   elif CallbackQuery.data == "reversetrim" :
      await CallbackQuery.edit_message_text("جار القص  ")
+     await downloadtoserver(nepho)
      starsec = re.split(':',strt_point)
      if len(starsec) == 3 :
         strtseconds = int(starsec[0])*60*60 + int(starsec[1])*60 + int(starsec[2])
@@ -1185,7 +1216,7 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "transcribe":
    await CallbackQuery.edit_message_text("معالجة ⏱️")
    await downloadtoserver(nepho)
-   if ex == ".mp3" or ex == ".m4a" or ex == ".ogg" or ex == ".mkv" or ex == ".mp4" :
+   if exo in audioforms or exo in videoforms :
     try: 
       with open('transcription.txt', 'r') as fh:
         if os.stat('transcription.txt').st_size == 0: 
@@ -1204,7 +1235,7 @@ async def _telegram_file(client, message):
     os.remove(file_path) 
     os.remove(mp3file) 
     os.remove(result) 
-   elif  ex == ".pdf":
+   elif  exo == ".pdf":
     try: 
       with open('final.txt', 'r') as fh:
         if os.stat('final.txt').st_size == 0: 
@@ -1256,7 +1287,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("تم التفريغ  ✅  ")
     shutil.rmtree('./temp/') 
     os.remove(result)
-   elif  ex == ".jpg" or ex == ".png" :
+   elif  exo in imageforms :
     await CallbackQuery.edit_message_text("جار التفريغ")
     lang_code = "ara"
     data_url = f"https://github.com/tesseract-ocr/tessdata/raw/main/{lang_code}.traineddata"
@@ -1289,28 +1320,18 @@ async def _telegram_file(client, message):
 
   elif CallbackQuery.data == "audmerge":
     await CallbackQuery.edit_message_text("معالجة ⏱")
-    await downloadtoserver(nepho)
-    if ex == ".m4a" or ex == ".mp3" or ex == ".ogg":
+    if exo in audioforms:
      await CallbackQuery.edit_message_text("جار الإضافة ")
-     tempmp3 = f"{random.randint(1,1000)}{ex}"
-     os.replace(file_path,tempmp3)
-     audmergelist.append(tempmp3)
+     audmergelist.append(nepho)
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
-    elif ex == ".mp4" or ex == ".mkv" : 
-     cmd('mkdir data')
-     mergeviditem = f"./data/{random.randint(1,100)}.mp4"
-     os.rename(file_path,mergeviditem)
-     vidmergelist.append(mergeviditem)
+    elif exo in videoforms : 
+     vidmergelist.append(nepho)
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
-    elif ex == ".jpg" or ex == ".png":
+    elif exo in imageforms:
      imagedic.append(file_path)
      await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
-    elif ex == ".pdf":
-      pdfdir = f"pdfmerge/{filename}"
-      cmd("mkdir pdfmerge")
-      cmd(f'''mv "{file_path}" ./pdfmerge/''')
-      with open('pdfy.txt','a') as f:
-       f.write(f'''{pdfdir} \n''')  
+    elif exo == ".pdf":
+      pdfqueemerge.append(nepho)
       await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
     queeq.clear()  
 
@@ -1318,9 +1339,12 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("جار الدمج") 
     cmd(f'''mkdir mergy''')
     for x in range(0,len(audmergelist)) :
-     mp3merge = f"{random.randint(0,1000)}.mp3"
-     cmd(f'''ffmpeg -i "{audmergelist[x]}" -q:a 0 -map a "{mp3merge}" -y ''')
-     os.remove(audmergelist[x])
+     await downloadtoserver(audmergelist[x])
+     tempmp3 = f"{random.randint(1,1000)}{ex}"
+     os.replace(file_path,tempmp3)
+     mp3merge = f"./mergy/{random.randint(0,1000)}.mp3"
+     cmd(f'''ffmpeg -i "{tempmp3}" -q:a 0 -map a "{mp3merge}" -y ''')
+     os.remove(tempmp3)
      with open('list.txt','a') as f:
       f.write(f'''file '{mp3merge}' \n''')
     cmd(f'''ffmpeg -f concat -safe 0 -i list.txt "{mp3file}" -y ''')
@@ -1334,6 +1358,13 @@ async def _telegram_file(client, message):
   
   elif CallbackQuery.data == "pdfmergenow":
       await CallbackQuery.edit_message_text("جار الدمج")
+      for x in range(0,len(pdfqueemerge)):
+       await downloadtoserver(pdfqueemerge[x])
+       pdfdir = f"pdfmerge/{filename}"
+       cmd("mkdir pdfmerge")
+       cmd(f'''mv "{file_path}" ./pdfmerge/''')
+       with open('pdfy.txt','a') as f:
+        f.write(f'''{pdfdir} \n''')  
       pdfs = []
       with open("pdfy.txt", "r") as file:
        for line in file:
@@ -1341,13 +1372,12 @@ async def _telegram_file(client, message):
       merger = PdfMerger()
       for pdf in pdfs:
        merger.append(pdf)
-      pdfmerged = f"{filename}.pdf"
+      pdfmerged = filename
       merger.write(pdfmerged)
       merger.close()
       await  bot.send_document(user_id,pdfmerged)
       await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
       shutil.rmtree("./pdfmerge/")
-      cmd(f'''rm "{pdfmerged}" pdfy.txt''')
       os.remove(pdfmerged);os.remove("pdfy.txt")
       queeq.clear()
 
@@ -1397,6 +1427,12 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "vidmergenow" :
      await CallbackQuery.edit_message_text("جار الدمج")
+     for x in range(0,len(vidmergelist)):
+        await downloadtoserver(vidmergelist[x])
+        cmd("mkdir data")
+        tempmp4file = f"./data/{mp4file}"
+        os.rename(file_path,tempmp4file)
+        vidmergelist[x] = tempmp4file
      for x in range(1,len(vidmergelist)):
         cmd(f'''ffmpeg -i "{vidmergelist[0]}" -i "{vidmergelist[1]}"  -filter_complex "[0]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v0];[1]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1[v1];[v0][0:a:0][v1][1:a:0]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" "mod.mp4"''') 
         os.rename("mod.mp4",mp4file)
@@ -1479,7 +1515,7 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "vidasp":
     await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
-    if ex == ".mp4" or ex == ".mkv":
+    if exo in videoforms:
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDRES_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDRES_MODE_BUTTONS))
    # elif ex == ".png" or ex == ".jpg":
     #  await replo.delete()
@@ -1526,16 +1562,17 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "vidsrt" :
      await CallbackQuery.edit_message_text("معالجة ⏱️")
      await downloadtoserver(nepho)
-     if (len(vidsrt) == 0 or len(vidsrt) > 2 ) and (ex == ".ass" or ex == ".srt") :
+     if (len(vidsrt) == 0 or len(vidsrt) > 2 ) and (exo == ".ass" or exo == ".srt") :
         vidsrt.clear()
         vidsrt.append(file_path)
         await CallbackQuery.edit_message_text("الآن أرسل الفيديو")
-     elif (len(vidsrt) == 0 or len(vidsrt) > 2 ) and (ex == ".mp4" or ex == ".mkv") :
+     elif (len(vidsrt) == 0 or len(vidsrt) > 2 ) and (exo in videoforms) :
         vidsrt.clear()
         vidsrt.append(file_path)
         await CallbackQuery.edit_message_text("الآن أرسل ملف الترجمة")
 
-     elif (len(vidsrt) == 1) and (ex == ".mp4" or ex == ".mkv") :  
+     elif (len(vidsrt) == 1) and (exo in videoforms ) :  
+        await CallbackQuery.edit_message_text("جار الدمج ⏱️")
         subfile = vidsrt[0]
         vidfile = file_path
         cmd(f'''ffmpeg -i "{vidfile}" -filter_complex subtitles='{subfile}' -c:a copy "{mp4file}"''')
@@ -1545,7 +1582,8 @@ async def _telegram_file(client, message):
         os.remove(vidfile)
         os.remove(mp4file)
         vidsrt.clear()
-     elif (len(vidsrt) == 1) and (ex == ".ass" or ex == ".srt") : 
+     elif (len(vidsrt) == 1) and (exo == ".ass" or exo == ".srt") : 
+        await CallbackQuery.edit_message_text("جار الدمج ⏱️")
         subfile = file_path
         vidfile = vidsrt[0]
         cmd(f'''ffmpeg -i "{vidfile}" -filter_complex subtitles='{subfile}' -c:a copy "{mp4file}"''')
@@ -1643,6 +1681,7 @@ async def _telegram_file(client, message):
     os.rename(file_path,mergeviditem)
     await CallbackQuery.edit_message_text(text =PRESS_ZIP_FILE,reply_markup = InlineKeyboardMarkup(PRESS_ZIP_FILE_BUTTONS))
   elif  CallbackQuery.data == "zipnow" :
+    await CallbackQuery.edit_message_text("جار الأرشفة  ⏱️  ")
     zipfile = f"{nom}.zip"
     shutil.make_archive(nom, 'zip', './zipdir/')
     await bot.send_document(user_id,zipfile)
@@ -1658,7 +1697,7 @@ async def _telegram_file(client, message):
    await downloadtoserver(nepho)
    unzippath = "./unzipprocess/"
    cmd(f'mkdir "{unzippath}"')
-   if ex == ".zip":
+   if exo == ".zip":
      with ZipFile(file_path, 'r') as zObject: 
       zObject.extractall(path=unzippath) 
      files = os.listdir(unzippath)
@@ -1675,7 +1714,7 @@ async def _telegram_file(client, message):
       else :
           await bot.send_document(user_id,sentfile)
      shutil.rmtree(unzippath)  
-   elif ex == ".pdf":
+   elif exo == ".pdf":
     pdf = pdfium.PdfDocument(f'{file_path}')
     n_pages = len(pdf)
     for page_number in range(n_pages):
@@ -1696,7 +1735,7 @@ async def _telegram_file(client, message):
       sentfile = f"{unzippath}{images[x]}"
       await bot.send_document(user_id,sentfile)
     shutil.rmtree(unzippath)
-   await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
+   await CallbackQuery.edit_message_text("تم الاستخراج  ✅  ")
    queeq.clear()
 
     ############ خاصية الرفع ليوتيوب ###########
@@ -1785,11 +1824,11 @@ async def _telegram_file(client, message):
           global newfile
           newfile = f"{newname}{ex}"
           os.rename(file_path,newfile)
-          if (ex == ".mp3" or ex == ".m4a" or ex == ".ogg") :
+          if exo in audioforms :
             await bot.send_audio(user_id,newfile)
-          elif (ex == ".mp4" or ex == ".mkv") :
+          elif exo in videoforms  :
             await bot.send_video(user_id,newfile)
-          elif (ex == ".jpg" or ex == ".png") :
+          elif exo in imageforms :
             await bot.send_photo(user_id,newfile)
           else : 
              await bot.send_document(user_id,newfile)
