@@ -14,6 +14,7 @@ audioforms = [".mp3",".ogg",".m4a"]
 videoforms = [".mp4",".mkv"]
 temptxt = "res.txt"
 import tika
+tika.initVM()
 from tika import parser
 from oauth2client.file import Storage
 from httplib2 import HttpLib2Error
