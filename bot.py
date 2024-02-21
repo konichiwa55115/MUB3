@@ -1364,7 +1364,8 @@ async def _telegram_file(client, message):
        cmd("mkdir pdfmerge")
        cmd(f'''mv "{file_path}" ./pdfmerge/''')
        with open('pdfy.txt','a') as f:
-        f.write(f'''{pdfdir} \n''')  
+        f.write(f'''{pdfdir} \n''')
+      pdfqueemerge.clear()  
       pdfs = []
       with open("pdfy.txt", "r") as file:
        for line in file:
