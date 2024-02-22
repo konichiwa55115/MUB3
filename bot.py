@@ -12,6 +12,10 @@ queeq = []
 imageforms = [".jpg",".png"]
 audioforms = [".mp3",".ogg",".m4a"]
 videoforms = [".mp4",".mkv"]
+audmergedel = []
+vidmergedel = []
+photomergedel = []
+pdfmergedel = []
 temptxt = "res.txt"
 import tika
 tika.initVM()
@@ -1324,18 +1328,30 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "audmerge":
     await CallbackQuery.edit_message_text("معالجة ⏱")
     if exo in audioforms:
+     if len(audmergedel) != 0 :
+        await audmergedel[0].delete()
      await CallbackQuery.edit_message_text("جار الإضافة ")
      audmergelist.append(nepho)
-     await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
+     audnowpull = await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
+     audmergedel.append(audnowpull)
     elif exo in videoforms : 
+     if len(vidmergedel) != 0 :
+        await vidmergedel[0].delete()
      vidmergelist.append(nepho)
-     await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
+     vidnowpull = await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
+     vidmergedel.append(vidnowpull)
     elif exo in imageforms:
-     imagedic.append(file_path)
-     await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
+     if len(photomergedel) != 0 :
+        await photomergedel[0].delete()
+     imagedic.append(nepho)
+     imagepullnow = await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
+     photomergedel.append(imagepullnow)
     elif exo == ".pdf":
+      if len(pdfmergedel) != 0 :
+        await pdfmergedel[0].delete()
       pdfqueemerge.append(nepho)
-      await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
+      pdfpullnow = await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
+      pdfmergedel.append(pdfpullnow)
     queeq.clear()  
 
   elif CallbackQuery.data == "mergenow":
@@ -1381,13 +1397,17 @@ async def _telegram_file(client, message):
       merger.close()
       await  bot.send_document(user_id,pdfmerged)
       await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
-      shutil.rmtree("./pdfmerge/")
+      shutil.rmtree("/pdfmerge/")
       os.remove(pdfmerged);os.remove("pdfy.txt")
       queeq.clear()
 
   elif CallbackQuery.data == "imagemergenow" :
           await CallbackQuery.edit_message_text(text = PRESS_MERGEMODE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGEMODE_IMAGE_BUTTONS))
   elif CallbackQuery.data == "sidebyside" :
+     await CallbackQuery.edit_message_text("جار الدمج")
+     for x in range(0,len(imagedic)):
+      await downloadtoserver(imagedic[x])
+      imagedic[x] = file_path
      output_img = f"{nom}.jpg"
      image1 = str(imagedic[0])
      image2 = str(imagedic[1])
@@ -1408,6 +1428,10 @@ async def _telegram_file(client, message):
      queeq.clear()
 
   elif CallbackQuery.data == "updown" :
+     await CallbackQuery.edit_message_text("جار الدمج")
+     for x in range(0,len(imagedic)):
+      await downloadtoserver(imagedic[x])
+      imagedic[x] = file_path
      output_img = f"{nom}.jpg"
      image1 = imagedic[0]
      image2 = imagedic[1]
