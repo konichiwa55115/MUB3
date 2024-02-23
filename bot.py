@@ -1329,26 +1329,30 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("معالجة ⏱")
     if exo in audioforms:
      if len(audmergedel) != 0 :
-        await audmergedel[0].delete()
+        for x in audmergedel:
+         await x.delete()
      await CallbackQuery.edit_message_text("جار الإضافة ")
      audmergelist.append(nepho)
      audnowpull = await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
      audmergedel.append(audnowpull)
     elif exo in videoforms : 
      if len(vidmergedel) != 0 :
-        await vidmergedel[0].delete()
+        for x in vidmergedel:
+         await x.delete()
      vidmergelist.append(nepho)
      vidnowpull = await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
      vidmergedel.append(vidnowpull)
     elif exo in imageforms:
      if len(photomergedel) != 0 :
-        await photomergedel[0].delete()
+        for x in photomergedel:
+         await x.delete()
      imagedic.append(nepho)
      imagepullnow = await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
      photomergedel.append(imagepullnow)
     elif exo == ".pdf":
       if len(pdfmergedel) != 0 :
-        await pdfmergedel[0].delete()
+        for x in pdfmergedel:
+         await x.delete()
       pdfqueemerge.append(nepho)
       pdfpullnow = await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
       pdfmergedel.append(pdfpullnow)
@@ -1377,10 +1381,10 @@ async def _telegram_file(client, message):
   
   elif CallbackQuery.data == "pdfmergenow":
       await CallbackQuery.edit_message_text("جار الدمج")
+      cmd("mkdir pdfmerge")
       for x in range(0,len(pdfqueemerge)):
        await downloadtoserver(pdfqueemerge[x])
        pdfdir = f"pdfmerge/{filename}"
-       cmd("mkdir pdfmerge")
        cmd(f'''mv "{file_path}" ./pdfmerge/''')
        with open('pdfy.txt','a') as f:
         f.write(f'''{pdfdir} \n''')
@@ -1397,7 +1401,7 @@ async def _telegram_file(client, message):
       merger.close()
       await  bot.send_document(user_id,pdfmerged)
       await CallbackQuery.edit_message_text("تم الدمج  ✅  ")
-      shutil.rmtree("/pdfmerge/")
+      shutil.rmtree("./pdfmerge/")
       os.remove(pdfmerged);os.remove("pdfy.txt")
       queeq.clear()
 
