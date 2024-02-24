@@ -852,6 +852,7 @@ def command2(bot,message):
     shutil.rmtree("./vidmerge/")
     shutil.rmtree("./vidmerge2/")
     shutil.rmtree("./downloads/")
+    shutil.rmtree("./unzipprocess/")
     audmergelist.clear()
     vidmergelist.clear()
 
@@ -1718,11 +1719,17 @@ async def _telegram_file(client, message):
 
   elif  CallbackQuery.data == "zipfile" :
     await CallbackQuery.edit_message_text("معالجة ⏱️")
+    if len(pdfmergedel) != 0 :
+        for x in pdfmergedel:
+         await x.delete()
     await downloadtoserver(nepho)
     cmd('mkdir zipdir')
     mergeviditem = f"./zipdir/{filename}"
     os.rename(file_path,mergeviditem)
-    await CallbackQuery.edit_message_text(text =PRESS_ZIP_FILE,reply_markup = InlineKeyboardMarkup(PRESS_ZIP_FILE_BUTTONS))
+    pdfpullnow = await CallbackQuery.edit_message_text(text =PRESS_ZIP_FILE,reply_markup = InlineKeyboardMarkup(PRESS_ZIP_FILE_BUTTONS))
+    pdfmergedel.append(pdfpullnow)
+    queeq.clear()
+
   elif  CallbackQuery.data == "zipnow" :
     await CallbackQuery.edit_message_text("جار الأرشفة  ⏱️  ")
     zipfile = f"{nom}.zip"
