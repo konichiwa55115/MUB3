@@ -712,10 +712,15 @@ def command20(bot,message):
        cmd(f'''yt-dlp -f 18 -ciw  -o "{video}" "{ytlink}"''')
        bot.send_video(yt_id, video,caption=video_title)
        os.remove(video)
-     else : 
+     elif dlmode == "aud" : 
        cmd(f'''yt-dlp -ciw  --extract-audio --audio-format mp3  -o "{audio}"  "{ytlink}"''')
        bot.send_audio(yt_id, audio,caption=video_title)
        os.remove(audio)
+     else :
+       cmd(f'''yt-dlp -ciw  -o "{video}"  "{ytlink}"''')
+       bot.send_video(yt_id, video,caption=video_title)
+       os.remove(video)
+        
 @bot.on_message(filters.command('yttransy') & filters.text & filters.private)
 def command4(bot,message):
      url = message.text.split("yttransy ", maxsplit=1)[1]
@@ -1020,6 +1025,9 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "conv" :
     await CallbackQuery.edit_message_text("معالجة ⏱️")
     if exo in imageforms :
+      if len(photomergedel) != 0 :
+        for x in photomergedel:
+         await x.delete()
       await downloadtoserver(nepho)
       imagepdfdic1.append(file_path)
       global imagey
@@ -1027,7 +1035,9 @@ async def _telegram_file(client, message):
       if len(imagepdfdic1) > 1 :
        image2 = Image.open(file_path).convert('RGB')
        imagepdfdic.append(image2)
-      await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
+      imagepullnow = await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
+      photomergedel.append(imagepullnow)
+
     else :
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
     queeq.clear() 
@@ -1051,6 +1061,7 @@ async def _telegram_file(client, message):
 
 
   elif CallbackQuery.data == "convnow" :
+    await CallbackQuery.edit_message_text("جار التحويل   ") 
     pdffile = f"{nom}.pdf"
     imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
     await bot.send_document(user_id,pdffile)
@@ -1388,7 +1399,7 @@ async def _telegram_file(client, message):
        cmd(f'''mv "{file_path}" ./pdfmerge/''')
        with open('pdfy.txt','a') as f:
         f.write(f'''{pdfdir} \n''')
-      pdfqueemerge.clear()  
+      pdfqueemerge.clear()
       pdfs = []
       with open("pdfy.txt", "r") as file:
        for line in file:
