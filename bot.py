@@ -68,6 +68,37 @@ bot = Client(
 #6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
 
+    
+def ytdlfunc(x,y,z):
+     ytlink = x
+     dlmode = y
+     yt_id = z
+     with YoutubeDL() as ydl: 
+        info_dict = ydl.extract_info(f'{ytlink}', download=False)
+        video_url = info_dict.get("url", None)
+        video_id = info_dict.get("id", None)
+        video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
+        video = f"{video_title}.mp4" 
+        audio = f"{video_title}.mp3"      
+     if dlmode == "vid" :  
+       cmd(f'''yt-dlp -f 18 -ciw  -o "{video}" "{ytlink}"''')
+       bot.send_video(yt_id, video,caption=video_title)
+       os.remove(video)
+     elif dlmode == "vid720" :
+       cmd(f'''yt-dlp -f 18 -ciw  -o "{video}" "{ytlink}"''')
+       bot.send_video(yt_id, video,caption=video_title)
+       os.remove(video)
+     elif dlmode == "aud" : 
+       cmd(f'''yt-dlp -ciw  --extract-audio --audio-format mp3  -o "{audio}"  "{ytlink}"''')
+       bot.send_audio(yt_id, audio,caption=video_title)
+       os.remove(audio)
+     else :
+       cmd(f'''yt-dlp -ciw  -o "{video}"  "{ytlink}"''')
+       bot.send_video(yt_id, video,caption=video_title)
+       os.remove(video)
+
+
+
 def ytsubfunc(x,y):
   ytlink = x
   yt_id = y
@@ -90,48 +121,9 @@ def ytplstfunc(linky,dlmodey,ytplstidy) :
   dlmode = dlmodey
   ytplstid = ytplstidy
   playlist = Playlist(url)
-  if dlmode == "vid" : 
-       for i in playlist:
-         link = i
-         with YoutubeDL() as ydl: 
-          info_dict = ydl.extract_info(f'{link}', download=False)
-          video_url = info_dict.get("url", None)
-          video_id = info_dict.get("id", None)
-          video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "") 
-          mp32file =   f"{video_title}.mp3"
-          txtresfile = f"{video_title}.txt"
-          mp42file =   f"{video_title}.mp4"
-         cmd(f'''yt-dlp -f 18 -ciw  -o "{mp42file}" "{link}"''')
-         bot.send_video(ytplstid, mp42file,caption=video_title)
-         os.remove(mp42file)
-  elif dlmode == "vid720":
-      for i in playlist:
-         link = i
-         with YoutubeDL() as ydl: 
-          info_dict = ydl.extract_info(f'{link}', download=False)
-          video_url = info_dict.get("url", None)
-          video_id = info_dict.get("id", None)
-          video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "") 
-          mp32file =   f"{video_title}.mp3"
-          txtresfile = f"{video_title}.txt"
-          mp42file =   f"{video_title}.mp4"
-         cmd(f'''yt-dlp -f 22 -ciw  -o "{mp42file}" "{link}"''')
-         bot.send_video(ytplstid, mp42file,caption=video_title)
-         os.remove(mp42file)
-  elif dlmode == "aud" : 
-      for i in playlist:
-         link = i
-         with YoutubeDL() as ydl: 
-          info_dict = ydl.extract_info(f'{link}', download=False)
-          video_url = info_dict.get("url", None)
-          video_id = info_dict.get("id", None)
-          video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "") 
-          mp32file =   f"{video_title}.mp3"
-          txtresfile = f"{video_title}.txt"
-          mp42file =   f"{video_title}.mp4"
-         cmd(f'''yt-dlp -ciw  --extract-audio --audio-format mp3  -o "{video_title}"  "{link}"''')
-         bot.send_audio(ytplstid, mp32file,caption=video_title)
-         os.remove(mp32file)
+  for i in playlist:
+    ytdlfunc(i,dlmode,ytplstid)
+  
 
 
 def ytsubplstfunc(x,y) :
@@ -761,38 +753,8 @@ def command20(bot,message):
      yt_id = message.from_user.id
      ytsubplstfunc(ytlink,yt_id)
      
+ 
      
-        
-
-@bot.on_message(filters.command('ytdl') & filters.text & filters.private)
-def command20(bot,message):
-     global yt_id , ytlink
-     dlmode = message.text.split(" ")[-1] 
-     ytlink = message.text.split("ytdl", maxsplit=1)[1].replace(" ", "")
-     yt_id = message.from_user.id
-     with YoutubeDL() as ydl: 
-        info_dict = ydl.extract_info(f'{ytlink}', download=False)
-        video_url = info_dict.get("url", None)
-        video_id = info_dict.get("id", None)
-        video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
-        video = f"{video_title}.mp4" 
-        audio = f"{video_title}.mp3"      
-     if dlmode == "vid" :  
-       cmd(f'''yt-dlp -f 18 -ciw  -o "{video}" "{ytlink}"''')
-       bot.send_video(yt_id, video,caption=video_title)
-       os.remove(video)
-     elif dlmode == "vid720" :
-       cmd(f'''yt-dlp -f 18 -ciw  -o "{video}" "{ytlink}"''')
-       bot.send_video(yt_id, video,caption=video_title)
-       os.remove(video)
-     elif dlmode == "aud" : 
-       cmd(f'''yt-dlp -ciw  --extract-audio --audio-format mp3  -o "{audio}"  "{ytlink}"''')
-       bot.send_audio(yt_id, audio,caption=video_title)
-       os.remove(audio)
-     else :
-       cmd(f'''yt-dlp -ciw  -o "{video}"  "{ytlink}"''')
-       bot.send_video(yt_id, video,caption=video_title)
-       os.remove(video)
         
 @bot.on_message(filters.command('yttransy') & filters.text & filters.private)
 def command4(bot,message):
@@ -833,6 +795,14 @@ def command4(bot,message):
      dlmode = message.text.split(" ")[-1] 
      ytplstid = message.from_user.id
      ytplstfunc(url,dlmode,ytplstid)
+
+@bot.on_message(filters.command('ytdl') & filters.text & filters.private)
+def command20(bot,message):
+     global yt_id , ytlink
+     dlmode = message.text.split(" ")[-1] 
+     ytlink = message.text.split("ytdl", maxsplit=1)[1].replace(" ", "")
+     yt_id = message.from_user.id
+     ytdlfunc(ytlink,dlmode,yt_id)
      
      
 @bot.on_message(filters.command('upld') & filters.text & filters.private)
