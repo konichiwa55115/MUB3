@@ -116,13 +116,15 @@ def ytsubfunc(x,y):
   os.remove(subfile)
 
 
-def ytplstfunc(linky,dlmodey,ytplstidy) :
+def ytplstfunc(linky,dlmodey,ytplstidy,numby) :
   url = linky
   dlmode = dlmodey
   ytplstid = ytplstidy
   playlist = Playlist(url)
-  for i in playlist:
-    ytdlfunc(i,dlmode,ytplstid)
+  for i in range(int(numby),len(playlist)) :
+    ytdlfunc(playlist[i],dlmode,ytplstid)
+
+  
   
 
 
@@ -790,11 +792,15 @@ def command4(bot,message):
 
 @bot.on_message(filters.command('ytplst') & filters.text & filters.private)
 def command4(bot,message):
-     x = message.text.split(" ")[1]
-     url = x.split(" ")[0]
-     dlmode = message.text.split(" ")[-1] 
+     url = message.text.split(" ")[1]
+     dlmode = message.text.split(" ")[2] 
      ytplstid = message.from_user.id
-     ytplstfunc(url,dlmode,ytplstid)
+     if len(message.text.split(" ")) == 3 :
+      ytplstfunc(url,dlmode,ytplstid,0)
+     elif len(message.text.split(" ")) == 4 :
+      numpy = message.text.split(" ")[-1] 
+      ytplstfunc(url,dlmode,ytplstid,numpy)
+
 
 @bot.on_message(filters.command('ytdl') & filters.text & filters.private)
 def command20(bot,message):
