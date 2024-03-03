@@ -626,11 +626,23 @@ def merge_images2(file1, file2):
     image2 = Image.open(file2)
     (width1, height1) = image1.size
     (width2, height2) = image2.size
-    result_width = width1 + width2
     result_height = max(height1, height2)
-    result = Image.new('RGB', (result_width, result_height))
-    result.paste(im=image1, box=(0, 0))
-    result.paste(im=image2, box=(width1, 0))
+    if height1 > height2 :
+      aspectowidth2 = (result_height * width2) / height2
+      result_width = width1 + int(aspectowidth2)
+      result = Image.new('RGB', (result_width, result_height))
+      iso1 = image1.resize((width1,result_height))
+      iso2 = image2.resize((int(aspectowidth2),result_height))
+      result.paste(iso1, box=(0, 0))
+      result.paste(iso2, box=(width1, 0))
+    else :
+      aspectowidth1 = (result_height * width1) / height1
+      result_width = width2 + int(aspectowidth1)
+      result = Image.new('RGB', (result_width, result_height))
+      iso1 = image1.resize((aspectowidth1,result_height))
+      iso2 = image2.resize((width2,result_height))
+      result.paste(iso1, box=(0, 0))
+      result.paste(iso2, box=(aspectowidth1, 0))
     return result
 
 
