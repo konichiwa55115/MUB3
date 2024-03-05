@@ -639,10 +639,10 @@ def merge_images2(file1, file2):
       aspectowidth1 = (result_height * width1) / height1
       result_width = width2 + int(aspectowidth1)
       result = Image.new('RGB', (result_width, result_height))
-      iso1 = image1.resize((aspectowidth1,result_height))
+      iso1 = image1.resize((int(aspectowidth1),result_height))
       iso2 = image2.resize((width2,result_height))
       result.paste(iso1, box=(0, 0))
-      result.paste(iso2, box=(aspectowidth1, 0))
+      result.paste(iso2, box=(int(aspectowidth1), 0))
     return result
 
 
