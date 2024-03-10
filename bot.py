@@ -19,6 +19,8 @@ pdfmergedel = []
 temptxt = "res.txt"
 import tika
 tika.initVM()
+import urllib3 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from tika import parser
 from pytube import Playlist
 from oauth2client.file import Storage
@@ -760,6 +762,12 @@ def command9(bot,message):
   bucketname = bucketname.replace(" ", "")
   message.reply_text("تم ضبط المعرف ")
 
+@bot.on_message(filters.command('fbapi') & filters.text & filters.private)
+def command9(bot,message):
+  global FBAPI
+  FBAPI = message.text.split("fbapi", maxsplit=1)[1]
+  FBAPI = bucketname.replace(" ", "")
+  message.reply_text("تم ضبط API ")
 
 @bot.on_message(filters.command('ytsub') & filters.text & filters.private)
 def command20(bot,message):
@@ -1821,7 +1829,7 @@ async def _telegram_file(client, message):
        if nepho.from_user.id ==6234365091 :
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await downloadtoserver(nepho)
-         accesstoken = "EAAFyBZAo9GtgBOzZBLgAJnZBVjZB0f7YRjtF9D9s3m5c7VN0mtaLZCw1G6iVimpk8GaDMdoFc7HiPco82lBZCmsTqUxb54qwyWT9bmOCr6lBK9fS4oCZA2mcsHklv4ZBccd4PHWTXopATgc9FbZA3owLNv4qF5ykcZBRBC3RubCCt2252NV6ZClZCgKcX9Ofb18ZAl9NC8qeL5Gjqtcb75OCcCMzwXuEZD"
+         accesstoken = FBAPI
          files = {'source': open(file_path, 'rb')}
          payload = {
               'access_token': accesstoken, 
