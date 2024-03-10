@@ -1825,7 +1825,7 @@ async def _telegram_file(client, message):
          files = {'source': open(file_path, 'rb')}
          payload = {
               'access_token': accesstoken, 
-              'title': caption
+              'title': nepho.caption
               }
          url1 = f'''https://graph-video.facebook.com/v19.0/227535600451310/videos'''
          x2 = requests.post(url1,files=files,data=payload,verify=False)
