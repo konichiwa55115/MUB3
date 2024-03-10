@@ -1,5 +1,4 @@
 global temptxt,imagedic,imagepdfdic
-import patoolib
 montaglist = []
 vidsubslist = []
 imagedic = []
