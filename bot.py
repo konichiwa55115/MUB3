@@ -766,7 +766,7 @@ def command9(bot,message):
 def command9(bot,message):
   global FBAPI
   FBAPI = message.text.split("fbapi", maxsplit=1)[1]
-  FBAPI = bucketname.replace(" ", "")
+  FBAPI = FBAPI.replace(" ", "")
   message.reply_text("تم ضبط API ")
 
 @bot.on_message(filters.command('ytsub') & filters.text & filters.private)
