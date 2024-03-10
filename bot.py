@@ -1,4 +1,5 @@
 global temptxt,imagedic,imagepdfdic
+import patoolib
 montaglist = []
 vidsubslist = []
 imagedic = []
@@ -123,10 +124,6 @@ def ytplstfunc(linky,dlmodey,ytplstidy,numby) :
   playlist = Playlist(url)
   for i in range(int(numby),len(playlist)) :
     ytdlfunc(playlist[i],dlmode,ytplstid)
-
-  
-  
-
 
 def ytsubplstfunc(x,y) :
   url = x
@@ -597,7 +594,7 @@ async def spoody(spdrateaud,spdratevid):
        await  bot.send_video(user_id,mp4file)
        os.remove(file_path) 
        os.remove(mp4file) 
-   
+
 def merge_images1(file1, file2):
     image1 = Image.open(file1)
     image2 = Image.open(file2)
@@ -654,7 +651,7 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm")],
     [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
     [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("تلوين",callback_data="coloring")],
-[InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("الرفع ليوتيوب",callback_data="upldtout")],
+[InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("الرفع ليوتيوب",callback_data="upldtout"),InlineKeyboardButton("الرفع لفيسبوك",callback_data="manuscript")],
     [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip")],
     [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير الأبعاد  ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
     [InlineKeyboardButton("إبدال صوت الفيديو ",callback_data="subs"),InlineKeyboardButton("صورة إلى gif",callback_data="imagetogif"),InlineKeyboardButton("كتم الصوت ",callback_data="mute")]
@@ -1047,7 +1044,6 @@ async def _telegram_file(client, message):
        imagepdfdic.append(image2)
       imagepullnow = await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
       photomergedel.append(imagepullnow)
-
     else :
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
     queeq.clear() 
@@ -1822,6 +1818,24 @@ async def _telegram_file(client, message):
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
     queeq.clear()
+  elif  CallbackQuery.data == "manuscript" :
+       if nepho.from_user.id ==6234365091 :
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
+         await downloadtoserver(nepho)
+         accesstoken = "EAAFyBZAo9GtgBOzZBLgAJnZBVjZB0f7YRjtF9D9s3m5c7VN0mtaLZCw1G6iVimpk8GaDMdoFc7HiPco82lBZCmsTqUxb54qwyWT9bmOCr6lBK9fS4oCZA2mcsHklv4ZBccd4PHWTXopATgc9FbZA3owLNv4qF5ykcZBRBC3RubCCt2252NV6ZClZCgKcX9Ofb18ZAl9NC8qeL5Gjqtcb75OCcCMzwXuEZD"
+         files = {'source': open(file_path, 'rb')}
+         payload = {
+              'access_token': accesstoken, 
+              'title': caption
+              }
+         url1 = f'''https://graph-video.facebook.com/v19.0/227535600451310/videos'''
+         x2 = requests.post(url1,files=files,data=payload,verify=False)
+         print(x2.text)
+         os.remove(file_path)
+         await CallbackQuery.edit_message_text("تم الرفع ✅")
+       else :
+         await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
+       queeq.clear()   
     
 
  @bot.on_message(filters.private & filters.reply & filters.regex("="))
