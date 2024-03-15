@@ -1339,7 +1339,7 @@ async def _telegram_file(client, message):
     await CallbackQuery.edit_message_text("معالجة ⏱️")
     await downloadtoserver(nepho)
     await CallbackQuery.edit_message_text("جار الكتم")
-    cmd(f'''ffmpeg -i "{file_path}" -c copy -an "{mp4file}"''')
+    cmd(f'''ffmpeg -i "{file_path}" -f lavfi -i anullsrc -map 0:v -map 1:a -c:v copy -shortest "{mp4file}"''')
     await bot.send_document(user_id, mp4file)
     await CallbackQuery.edit_message_text("تم الكتم  ✅  ")
     os.remove(file_path) 
