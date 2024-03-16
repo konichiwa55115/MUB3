@@ -69,7 +69,17 @@ bot = Client(
 #6709809460:AAGWWXJBNMF_4ohBNRS22Tg0Q3-vkm376Eo
 #6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
-
+async def upldtofbpage(pageid,accesstoken,nepho):
+    fbpageid = pageid
+    accesstoken = FBAPI
+    await downloadtoserver(nepho)
+    files = {'source': open(file_path, 'rb')}
+    payload = {
+              'access_token': accesstoken, 
+              'title': nepho.caption }
+    url1 = f'''https://graph-video.facebook.com/v19.0/{fbpageid}/videos'''
+    x2 = requests.post(url1,files=files,data=payload,verify=False)
+    os.remove(file_path)
     
 def ytdlfunc(x,y,z):
      ytlink = x
@@ -687,6 +697,12 @@ CHOOSE_UR_TRIMMODE = "اختر نمط القص"
 CHOOSE_UR_TRIMMODE_BUTTONS = [
     [InlineKeyboardButton("قص عادي",callback_data="normaltrim")],
     [InlineKeyboardButton("قص معكوس",callback_data="reversetrim")]
+     ]
+
+CHOOSE_UR_FBPAGE = "اختر اسم الصفحة"
+CHOOSE_UR_FBPAGE_BUTTONS = [
+    [InlineKeyboardButton("أسئلة البوت",callback_data="kqa")],
+    [InlineKeyboardButton("فقه القرون",callback_data="fqo")]
      ]
 CHOOSE_UR_RTRIMFILE_MODE = "اختر نوع ملفك "
 CHOOSE_UR_RTRIMFILE_MODE_BUTTONS = [   
@@ -1821,6 +1837,16 @@ async def _telegram_file(client, message):
        parsed = parser.from_file(file_path)
        textfile = f"{nom}.txt"
        finaltext = parsed['content'].replace('\n',' ')
+       word = "¦"
+       words = [*finaltext]
+       positions = [ i+1 for i,w in enumerate(words) if w == word ]
+       for x in range(0,len(positions)):
+         wordindex = finaltext.find(word)
+         strt = int(wordindex-13)
+         end= int(wordindex+17)
+         fullstring = finaltext[strt:end] 
+         print(fullstring)
+         finaltext=finaltext.replace(fullstring,"")
        with open(textfile, "a") as f:     
         f.write(f" {finaltext} ")
        await bot.send_document(user_id,textfile)
@@ -1845,24 +1871,24 @@ async def _telegram_file(client, message):
     else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
     queeq.clear()
+
   elif  CallbackQuery.data == "manuscript" :
        if nepho.from_user.id ==6234365091 :
-         await CallbackQuery.edit_message_text("معالجة ⏱️")
-         await downloadtoserver(nepho)
-         accesstoken = FBAPI
-         files = {'source': open(file_path, 'rb')}
-         payload = {
-              'access_token': accesstoken, 
-              'title': nepho.caption
-              }
-         url1 = f'''https://graph-video.facebook.com/v19.0/227535600451310/videos'''
-         x2 = requests.post(url1,files=files,data=payload,verify=False)
-         print(x2.text)
-         os.remove(file_path)
-         await CallbackQuery.edit_message_text("تم الرفع ✅")
+         await CallbackQuery.edit_message_text(text = CHOOSE_UR_FBPAGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_FBPAGE_BUTTONS))
        else :
          await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
-       queeq.clear()   
+  elif CallbackQuery.data == "kqa":
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
+         await upldtofbpage(227535600451310,FBAPI,nepho)
+         await CallbackQuery.edit_message_text("تم الرفع ✅")
+         queeq.clear()
+
+  elif CallbackQuery.data == "fqo":
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
+         await upldtofbpage(137037322817687,FBAPI,nepho)
+         await CallbackQuery.edit_message_text("تم الرفع ✅")
+         queeq.clear()
+
     
 
  @bot.on_message(filters.private & filters.reply & filters.regex("="))
