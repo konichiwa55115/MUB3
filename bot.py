@@ -69,6 +69,48 @@ bot = Client(
 #6709809460:AAGWWXJBNMF_4ohBNRS22Tg0Q3-vkm376Eo
 #6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
+async def image2pdf(nepho):
+      if len(photomergedel) != 0 :
+        for x in photomergedel:
+         await x.delete()
+      await downloadtoserver(nepho)
+      imagepdfdic1.append(file_path)
+      global imagey1
+      imagey1 = Image.open(imagepdfdic1[0]).convert('RGB')
+      if len(imagepdfdic1) > 1 :
+       image2 = Image.open(file_path).convert('RGB')
+       imagepdfdic.append(image2)
+      imagepullnow = await nepho.reply(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
+      photomergedel.append(imagepullnow)
+async def photomerge(nepho):
+      if len(photomergedel) != 0 :
+        for x in photomergedel:
+         await x.delete()
+      imagedic.append(nepho)
+      imagepullnow = await nepho.reply(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
+      photomergedel.append(imagepullnow)
+async def pdfmerge(nepho):
+       if len(pdfmergedel) != 0 :
+        for x in pdfmergedel:
+         await x.delete()
+       pdfqueemerge.append(nepho)
+       pdfpullnow = await nepho.reply(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
+       pdfmergedel.append(pdfpullnow)
+async def videomerge(nepho):
+     if len(vidmergedel) != 0 :
+      for x in vidmergedel:
+         await x.delete()
+     vidmergelist.append(nepho)
+     vidnowpull = await nepho.reply(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
+     vidmergedel.append(vidnowpull)
+
+async def audmerge(nepho):
+     if len(audmergedel) != 0 :
+        for x in audmergedel:
+         await x.delete()
+     audmergelist.append(nepho)
+     audnowpull = await nepho.reply(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
+     audmergedel.append(audnowpull)
 async def upldtofbpage(pageid,accesstoken,nepho):
     fbpageid = pageid
     accesstoken = FBAPI
@@ -899,6 +941,44 @@ async def _telegram_file(client, message):
  queeq.append(message.from_user.id)
  global  replo,nepho,temponame,nomo,exo
  nepho = message
+ 
+ try :  
+   if mergeid :
+      if mergeid == nepho.from_user.id :
+         await audmerge(nepho)
+         return  
+ except NameError:
+    pass
+ try :  
+   if vidmergeid :
+      if vidmergeid == nepho.from_user.id :
+         await videomerge(nepho)
+         return  
+ except NameError:
+    pass
+ try :  
+   if pdfmergeid :
+      if pdfmergeid == nepho.from_user.id :
+         await pdfmerge(nepho)
+         return  
+ except NameError:
+    pass
+ try :  
+   if photomergeid :
+      if photomergeid == nepho.from_user.id :
+         await photomerge(nepho)
+         return  
+ except NameError:
+    pass
+ try :  
+   if imageconvid :
+      if imageconvid == nepho.from_user.id :
+         await image2pdf(nepho)
+         return  
+ except NameError:
+    pass
+ 
+   
  #print(nepho)
  if nepho.photo :
   nomo = nepho.photo.file_unique_id
@@ -1055,18 +1135,10 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "conv" :
     await CallbackQuery.edit_message_text("معالجة ⏱️")
     if exo in imageforms :
-      if len(photomergedel) != 0 :
-        for x in photomergedel:
-         await x.delete()
-      await downloadtoserver(nepho)
-      imagepdfdic1.append(file_path)
-      global imagey
-      imagey = Image.open(imagepdfdic1[0]).convert('RGB')
-      if len(imagepdfdic1) > 1 :
-       image2 = Image.open(file_path).convert('RGB')
-       imagepdfdic.append(image2)
-      imagepullnow = await CallbackQuery.edit_message_text(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
-      photomergedel.append(imagepullnow)
+     await replo.delete()
+     await image2pdf(nepho)
+     global imageconvid 
+     imageconvid = nepho.from_user.id
     else :
      await CallbackQuery.edit_message_text(text = CHOOSE_UR_CONV_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_CONV_MODE_BUTTONS))
     queeq.clear() 
@@ -1092,7 +1164,7 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "convnow" :
     await CallbackQuery.edit_message_text("جار التحويل   ") 
     pdffile = f"{nom}.pdf"
-    imagey.save(pdffile,save_all=True, append_images=imagepdfdic)
+    imagey1.save(pdffile,save_all=True, append_images=imagepdfdic)
     await bot.send_document(user_id,pdffile)
     await CallbackQuery.edit_message_text("تم التحويل ✅  ") 
     os.remove(pdffile)
@@ -1364,41 +1436,35 @@ async def _telegram_file(client, message):
 
  ##########  خواص الدمج ###########
 
-
   elif CallbackQuery.data == "audmerge":
-    await CallbackQuery.edit_message_text("معالجة ⏱")
     if exo in audioforms:
-     if len(audmergedel) != 0 :
-        for x in audmergedel:
-         await x.delete()
-     await CallbackQuery.edit_message_text("جار الإضافة ")
-     audmergelist.append(nepho)
-     audnowpull = await CallbackQuery.edit_message_text(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
-     audmergedel.append(audnowpull)
+     await audmerge(nepho)
+     global mergeid
+     mergeid = nepho.from_user.id
+     await replo.delete()
     elif exo in videoforms : 
-     if len(vidmergedel) != 0 :
-        for x in vidmergedel:
-         await x.delete()
-     vidmergelist.append(nepho)
-     vidnowpull = await CallbackQuery.edit_message_text(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
-     vidmergedel.append(vidnowpull)
+     
+        await videomerge(nepho)
+        global vidmergeid
+        vidmergeid = nepho.from_user.id
+        await replo.delete()
+
     elif exo in imageforms:
-     if len(photomergedel) != 0 :
-        for x in photomergedel:
-         await x.delete()
-     imagedic.append(nepho)
-     imagepullnow = await CallbackQuery.edit_message_text(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
-     photomergedel.append(imagepullnow)
+      global photomergeid 
+      photomergeid = nepho.from_user.id
+      await photomerge(nepho)
+      await replo.delete()
+     
     elif exo == ".pdf":
-      if len(pdfmergedel) != 0 :
-        for x in pdfmergedel:
-         await x.delete()
-      pdfqueemerge.append(nepho)
-      pdfpullnow = await CallbackQuery.edit_message_text(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
-      pdfmergedel.append(pdfpullnow)
+      global pdfmergeid 
+      pdfmergeid = nepho.from_user.id
+      await pdfmerge(nepho)
+      await replo.delete()
+      
     queeq.clear()  
 
   elif CallbackQuery.data == "mergenow":
+    mergeid = 1
     if len(audmergelist) < 2 :
         await CallbackQuery.edit_message_text("لقد أرسلت صوتية واحدة فقط !")
         return
@@ -1425,6 +1491,7 @@ async def _telegram_file(client, message):
     queeq.clear()
   
   elif CallbackQuery.data == "pdfmergenow":
+      pdfmergeid = 1
       if len(pdfqueemerge) < 2 :
         await CallbackQuery.edit_message_text("لقد أرسلت ملفاً واحداً فقط !")
         return
@@ -1456,6 +1523,7 @@ async def _telegram_file(client, message):
       queeq.clear()
 
   elif CallbackQuery.data == "imagemergenow" :
+     photomergeid = 1
      if len(imagedic) < 2 :
         await CallbackQuery.edit_message_text("لقد أرسلت صورة واحدة فقط !")
         return
@@ -1513,6 +1581,7 @@ async def _telegram_file(client, message):
      queeq.clear()
 
   elif  CallbackQuery.data == "vidmergenow" :
+     vidmergeid = 1
      if len(vidmergelist) < 2 :
         await CallbackQuery.edit_message_text("لقد أرسلت صورة واحدة فقط !")
         return
