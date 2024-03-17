@@ -82,6 +82,7 @@ async def image2pdf(nepho):
        imagepdfdic.append(image2)
       imagepullnow = await nepho.reply(text = THE_LAST_IMAGE,reply_markup = InlineKeyboardMarkup(THE_LAST_IMAGE_BUTTONS))
       photomergedel.append(imagepullnow)
+      queeq.clear()
 async def photomerge(nepho):
       if len(photomergedel) != 0 :
         for x in photomergedel:
@@ -89,6 +90,7 @@ async def photomerge(nepho):
       imagedic.append(nepho)
       imagepullnow = await nepho.reply(text = PRESS_MERGE_IMAGE,reply_markup = InlineKeyboardMarkup(PRESS_MERGE_IMAGE_BUTTONS))
       photomergedel.append(imagepullnow)
+      queeq.clear()
 async def pdfmerge(nepho):
        if len(pdfmergedel) != 0 :
         for x in pdfmergedel:
@@ -96,6 +98,7 @@ async def pdfmerge(nepho):
        pdfqueemerge.append(nepho)
        pdfpullnow = await nepho.reply(text = CHOOSE_UR_PDFMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_PDFMERGE_MODE_BUTTONS))
        pdfmergedel.append(pdfpullnow)
+       queeq.clear()
 async def videomerge(nepho):
      if len(vidmergedel) != 0 :
       for x in vidmergedel:
@@ -103,6 +106,7 @@ async def videomerge(nepho):
      vidmergelist.append(nepho)
      vidnowpull = await nepho.reply(text = CHOOSE_UR_VIDMERGE_MODE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_VIDMERGE_MODE_BUTTONS))
      vidmergedel.append(vidnowpull)
+     queeq.clear()
 
 async def audmerge(nepho):
      if len(audmergedel) != 0 :
@@ -111,6 +115,7 @@ async def audmerge(nepho):
      audmergelist.append(nepho)
      audnowpull = await nepho.reply(text = CHOOSE_UR_MERGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_MERGE_BUTTONS))
      audmergedel.append(audnowpull)
+     queeq.clear()
 async def upldtofbpage(pageid,accesstoken,nepho):
     fbpageid = pageid
     accesstoken = FBAPI
