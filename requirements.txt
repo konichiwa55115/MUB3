@@ -27,4 +27,8 @@ google-auth-oauthlib
 google-auth-httplib2
 tika
 pytube
-
+urllib3
+filetype==1.2.0
+tgbot-ping==1.0.7
+tornado==6.4
+tweepy==4.14.0
