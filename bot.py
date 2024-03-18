@@ -41,9 +41,12 @@ from http.client import (
 )
 
 from apiclient import http, errors, discovery
-from pyrogram import Client, filters,enums,StopTransmission
+from threading import Lock 
+from typing import Union
+from tgbot_ping import get_runtime
+from pyrogram import Client, filters,enums,StopTransmission,types
 from zipfile import ZipFile 
-import os ,re , random ,shutil,asyncio ,pytesseract,requests,logging,time,string,datetime,httplib2
+import os ,re , random ,shutil,asyncio ,pytesseract,requests,logging,time,string,datetime,httplib2,tempfile,traceback,tweepy
 from typing import Optional, Tuple, Union
 from os import system as cmd
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -56,6 +59,8 @@ from PDFNetPython3.PDFNetPython import PDFDoc, Optimizer, SDFDoc, PDFNet
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 from PIL import Image
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
+tweet_format = "https://twitter.com/{screen_name}/status/{id}"
 ytregex = r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$"
 bot = Client(
     "audiobot",
@@ -69,6 +74,101 @@ bot = Client(
 #6709809460:AAGWWXJBNMF_4ohBNRS22Tg0Q3-vkm376Eo
 #6466415254:AAE_m_mYGHFuu3MT4T0qzqVCm0WvR4biYvM
 #6812722455:AAEjCb1ZwgBa8DZ4_wVNNjDZbe6EtQZOUxo
+
+async def twitterupload(u,w,x,y,z):
+    nepho = z
+    global TwitterClient,TwitterApi
+    TwitterClient, TwitterApi = await __connect_twitter(u,w,x,y)
+    await tweet_single_photo_handler(TwitterClient, nepho)
+
+
+async def upload_media(api, pic) -> Union[list, None]:
+     if pic is None:
+        return None
+     ids = []
+     for item in pic:
+        item.seek(0)
+        mid = api.media_upload(item.name, file=item)
+        ids.append(mid)
+     return [i.media_id for i in ids]
+
+async def __get_tweet_id_from_reply(message) -> int:
+     reply_to = nepho.reply_to_message
+     if reply_to:
+        tweet_id = await __get_tweet_id_from_url(reply_to.entities[0].url or "")
+     else:
+        tweet_id = None
+     logging.info("Replying to %s", tweet_id)
+     return tweet_id
+
+async def __get_tweet_id_from_url(url) -> int:
+     try:
+        # https://twitter.com/williamwoo7/status/1326147700425809921?s=20
+        tweet_id = re.findall(r"https?://twitter\.com/.+/status/(\d+)", url)[0]
+     except IndexError:
+        tweet_id = None
+     return tweet_id
+
+async def __connect_twitter(u,w,x,y):
+     CONSUMER_KEY = u
+     CONSUMER_SECRET = w
+     ACCESS_KEY = x
+     ACCESS_SECRET = y
+     client = tweepy.Client(
+        consumer_key=CONSUMER_KEY,
+        consumer_secret=CONSUMER_SECRET,
+        access_token=ACCESS_KEY,
+        access_token_secret=ACCESS_SECRET,
+     )
+     api = tweepy.API(
+        tweepy.OAuth1UserHandler(
+            consumer_key=CONSUMER_KEY,
+            consumer_secret=CONSUMER_SECRET,
+            access_token=ACCESS_KEY,
+            access_token_secret=ACCESS_SECRET,
+        )
+     )
+     return client,api
+
+async def tweet_single_photo_handler(client, message: types.Message):
+     await nepho.reply_chat_action(enums.ChatAction.UPLOAD_PHOTO)
+     img_data = await nepho.download(in_memory=True)
+     setattr(img_data,"mode","rb")
+     result = await send_tweet(nepho,[img_data])
+     await notify_result(result,nepho)
+
+async def send_tweet(message, pics: Union[list, None] = None) -> dict:
+    logging.info("Preparing tweet for...")
+    chat_id = nepho.chat.id
+    text = nepho.text or nepho.caption
+    if not text:
+        text = ""
+    tweet_id = await __get_tweet_id_from_reply(message)
+    logging.info("Tweeting...")
+    ids = await upload_media(TwitterApi, pics)
+    try:
+        status = TwitterClient.create_tweet(text=text, media_ids=ids, in_reply_to_tweet_id=tweet_id)
+        logging.info("Tweeted")
+        response = status.data
+    except Exception as e:
+        if "Your Tweet text is too long." in str(e):
+            logging.warning("Tweet too long, trying to make it shorter...")
+            # try to post by making it shorter
+            status = TwitterClient.create_tweet(text=text[:110] + "...", media_ids=ids, in_reply_to_tweet_id=tweet_id)
+            response = status.data
+        else:
+            logging.error(traceback.format_exc())
+            response = {"error": str(e)}
+
+    return response
+async def notify_result(result, message: types.Message):
+     if result.get("error"):
+        resp = f"❌ Error: `{result['error']}`"
+     else:
+        url = tweet_format.format(screen_name="x", id=result["id"])
+        resp = f"✅ Your [tweet]({url}) has been sent.\n"
+     await nepho.reply_text(resp, quote=True, parse_mode=enums.ParseMode.MARKDOWN)
+
 async def image2pdf(nepho):
       if len(photomergedel) != 0 :
         for x in photomergedel:
@@ -708,7 +808,7 @@ CHOOSE_UR_AUDIO_MODE_BUTTONS = [
     [InlineKeyboardButton("تسريع ",callback_data="speedy"),InlineKeyboardButton("تحويل ",callback_data="conv"),InlineKeyboardButton("تفريغ ",callback_data="transcribe")], 
     [InlineKeyboardButton("دمج  ",callback_data="audmerge"),InlineKeyboardButton("إعادة التسمية ",callback_data="renm")],
     [InlineKeyboardButton("تغيير الصوت",callback_data="voicy"),InlineKeyboardButton("تقسيم الصوتية ",callback_data="splitty"),InlineKeyboardButton("إزالة الصمت",callback_data="rmvsilence")],
-    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("تلوين",callback_data="coloring")],
+    [InlineKeyboardButton("عكس pdf",callback_data="reversepdf"),InlineKeyboardButton("تلوين",callback_data="coloring"),InlineKeyboardButton("الرفع لتويتر",callback_data="upldtotwitter")],
 [InlineKeyboardButton("الرفع لأرشيف",callback_data="upldarch"),InlineKeyboardButton("الرفع ليوتيوب",callback_data="upldtout"),InlineKeyboardButton("الرفع لفيسبوك",callback_data="manuscript")],
     [InlineKeyboardButton("ضغط الملفات ",callback_data="zipfile"),InlineKeyboardButton("استخراج",callback_data="unzip")],
     [InlineKeyboardButton(" ترجمة + فيديو",callback_data="vidsrt"),InlineKeyboardButton("تغيير الأبعاد  ",callback_data="vidasp"),InlineKeyboardButton("منتجة فيديو ",callback_data="imagetovid")],
@@ -750,6 +850,11 @@ CHOOSE_UR_FBPAGE = "اختر اسم الصفحة"
 CHOOSE_UR_FBPAGE_BUTTONS = [
     [InlineKeyboardButton("أسئلة البوت",callback_data="kqa")],
     [InlineKeyboardButton("فقه القرون",callback_data="fqo")]
+     ]
+CHOOSE_UR_TWPAGE = "اختر اسم الصفحة"
+CHOOSE_UR_TWPAGE_BUTTONS = [
+    [InlineKeyboardButton("أسئلة البوت",callback_data="kqatwitter")],
+    [InlineKeyboardButton("فقه القرون",callback_data="fqotwitter")]
      ]
 CHOOSE_UR_RTRIMFILE_MODE = "اختر نوع ملفك "
 CHOOSE_UR_RTRIMFILE_MODE_BUTTONS = [   
@@ -1167,6 +1272,7 @@ async def _telegram_file(client, message):
 
 
   elif CallbackQuery.data == "convnow" :
+    imageconvid = 1
     await CallbackQuery.edit_message_text("جار التحويل   ") 
     pdffile = f"{nom}.pdf"
     imagey1.save(pdffile,save_all=True, append_images=imagepdfdic)
@@ -1962,9 +2068,32 @@ async def _telegram_file(client, message):
          await upldtofbpage(137037322817687,FBAPI,nepho)
          await CallbackQuery.edit_message_text("تم الرفع ✅")
          queeq.clear()
+  elif  CallbackQuery.data == "upldtotwitter" :
+    if nepho.from_user.id ==6234365091 :
+     await CallbackQuery.edit_message_text("معالجة ⏱️")
+     await CallbackQuery.edit_message_text(text = CHOOSE_UR_TWPAGE,reply_markup = InlineKeyboardMarkup(CHOOSE_UR_TWPAGE_BUTTONS))
+    else :
+         await CallbackQuery.edit_message_text("هذه الميزة متوفرة لمالك البوت فقط")
+  elif  CallbackQuery.data == "kqatwitter" :
+    await CallbackQuery.edit_message_text("معالجة ⏱ ")
+    CONSUMER_KEY = "i72lBPnd7xZlKYOl1ELaeUgt4"
+    CONSUMER_SECRET = "TE6STQVwjok9caTV1g8jjyPmxlbNnN4TbIdJ8GNmkiTFfqEoC4"
+    ACCESS_KEY = "1741622894411579392-tdooWDUon86TTunB4JtgvPll2rDwUw"
+    ACCESS_SECRET = "cS30r9Ff2nlWmX0Pb2Nuigfrip8Htvv5JlZgyJPWizTtk"
+    await twitterupload(CONSUMER_KEY,CONSUMER_SECRET,ACCESS_KEY,ACCESS_SECRET,nepho)
+    await CallbackQuery.edit_message_text("تم الرفع  ✅  ")
+    queeq.clear()
+  elif  CallbackQuery.data == "fqotwitter" :
+    await CallbackQuery.edit_message_text("معالجة ⏱ ")
+    CONSUMER_KEY = "vI7bd1TjXv5jfzvKzOKAb90yo"
+    CONSUMER_SECRET = "r1pkkhWP8IRBewkbZO9nXcDoNfwIUm8773qZ42QNBUxtyvBNnS"
+    ACCESS_KEY = "1764030842744020992-wqkXkqexkGsG1p1YtMBBT4WiZeTvGm"
+    ACCESS_SECRET = "dHE7bSnAUQKhutMjhNuMtrFU0fLJ2Yb4WEFYilipavz6H"
+    await twitterupload(CONSUMER_KEY,CONSUMER_SECRET,ACCESS_KEY,ACCESS_SECRET,nepho)
+    await CallbackQuery.edit_message_text("تم الرفع  ✅  ")
+    queeq.clear()
 
     
-
  @bot.on_message(filters.private & filters.reply & filters.regex("="))
  async def refunc(client,message):
    if (message.reply_to_message.reply_markup) and isinstance(message.reply_to_message.reply_markup, ForceReply)  :
