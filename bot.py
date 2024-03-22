@@ -849,7 +849,9 @@ CHOOSE_UR_TRIMMODE_BUTTONS = [
 CHOOSE_UR_FBPAGE = "اختر اسم الصفحة"
 CHOOSE_UR_FBPAGE_BUTTONS = [
     [InlineKeyboardButton("أسئلة البوت",callback_data="kqa")],
-    [InlineKeyboardButton("فقه القرون",callback_data="fqo")]
+    [InlineKeyboardButton("فقه القرون",callback_data="fqo")],
+    [InlineKeyboardButton("الأنصاري بن ابراهيم ",callback_data="ansary")]
+
      ]
 CHOOSE_UR_TWPAGE = "اختر اسم الصفحة"
 CHOOSE_UR_TWPAGE_BUTTONS = [
@@ -2066,6 +2068,11 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "fqo":
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await upldtofbpage(137037322817687,FBAPI,nepho)
+         await CallbackQuery.edit_message_text("تم الرفع ✅")
+         queeq.clear()
+  elif CallbackQuery.data == "ansary":
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
+         await upldtofbpage(112807441778266,FBAPI,nepho)
          await CallbackQuery.edit_message_text("تم الرفع ✅")
          queeq.clear()
   elif  CallbackQuery.data == "upldtotwitter" :
