@@ -2,7 +2,6 @@ pyrogram
 pyromod
 requests
 pytesseract
-Pillow
 tgcrypto
 ffmpeg
 Flask==2.2.2
@@ -18,6 +17,17 @@ pypdfium2==2.8.0
 pypdf
 PDFNetPython3
 PyPDF2
+pandas
+pytz 
+python-dateutil 
+pyparsing 
+packaging 
+kiwisolver 
+fonttools 
+cycler 
+contourpy  
+typing-extensions  
+pillow
 yt-dlp
 youtube-transcript-api
 httplib2
