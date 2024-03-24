@@ -239,7 +239,8 @@ def ytdlfunc(x,y,z):
         video_id = info_dict.get("id", None)
         video_title = info_dict.get('title', None).replace('＂', '').replace('"', '').replace("'", "").replace("｜", "").replace("|", "")
         video = f"{video_title}.mp4" 
-        audio = f"{video_title}.mp3"      
+        audio = f"{video_title}.mp3" 
+        elseformat = f"{video_id}.mp4"     
      if dlmode == "vid" :  
        cmd(f'''yt-dlp -f 18 -ciw  -o "{video}" "{ytlink}"''')
        bot.send_video(yt_id, video,caption=video_title)
@@ -253,9 +254,9 @@ def ytdlfunc(x,y,z):
        bot.send_audio(yt_id, audio,caption=video_title)
        os.remove(audio)
      else :
-       cmd(f'''yt-dlp -ciw  -o "{video}"  "{ytlink}"''')
-       bot.send_video(yt_id, video,caption=video_title)
-       os.remove(video)
+       cmd(f'''yt-dlp -ciw  -o "{elseformat}"  "{ytlink}"''')
+       bot.send_video(yt_id,elseformat,caption=video_title)
+       os.remove(elseformat)
 
 
 
