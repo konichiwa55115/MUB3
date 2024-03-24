@@ -223,7 +223,8 @@ async def upldtofbpage(pageid,accesstoken,nepho):
     files = {'source': open(file_path, 'rb')}
     payload = {
               'access_token': accesstoken, 
-              'title': nepho.caption }
+              'title': nepho.caption,
+              'description': nepho.caption }
     url1 = f'''https://graph-video.facebook.com/v19.0/{fbpageid}/videos'''
     x2 = requests.post(url1,files=files,data=payload,verify=False)
     os.remove(file_path)
@@ -850,7 +851,8 @@ CHOOSE_UR_FBPAGE = "اختر اسم الصفحة"
 CHOOSE_UR_FBPAGE_BUTTONS = [
     [InlineKeyboardButton("أسئلة البوت",callback_data="kqa")],
     [InlineKeyboardButton("فقه القرون",callback_data="fqo")],
-    [InlineKeyboardButton("الأنصاري بن ابراهيم ",callback_data="ansary")]
+    [InlineKeyboardButton("الأنصاري بن ابراهيم ",callback_data="ansary")],
+    [InlineKeyboardButton("السنة الواضحة ",callback_data="sunnah")]
 
      ]
 CHOOSE_UR_TWPAGE = "اختر اسم الصفحة"
@@ -2073,6 +2075,11 @@ async def _telegram_file(client, message):
   elif CallbackQuery.data == "ansary":
          await CallbackQuery.edit_message_text("معالجة ⏱️")
          await upldtofbpage(112807441778266,FBAPI,nepho)
+         await CallbackQuery.edit_message_text("تم الرفع ✅")
+         queeq.clear()
+  elif CallbackQuery.data == "sunnah":
+         await CallbackQuery.edit_message_text("معالجة ⏱️")
+         await upldtofbpage(104480982720950,FBAPI,nepho)
          await CallbackQuery.edit_message_text("تم الرفع ✅")
          queeq.clear()
   elif  CallbackQuery.data == "upldtotwitter" :
