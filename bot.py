@@ -285,12 +285,12 @@ def ytplstfunc(linky,dlmodey,ytplstidy,numby) :
   for i in range(int(numby),len(playlist)) :
     ytdlfunc(playlist[i],dlmode,ytplstid)
 
-def ytsubplstfunc(x,y) :
+def ytsubplstfunc(x,y,n) :
   url = x
   ytplstid = y
   playlist = Playlist(url)
-  for h in playlist :
-    ytsubfunc(h,ytplstid)
+  for i in range(int(n),len(playlist)) :
+    ytsubfunc(playlist[i],ytplstid)
 
 
 async def Coloringfunc(y):
@@ -828,7 +828,6 @@ YOUR_COLOR_MODE = "اختر نمط التلوين"
 YOUR_COLOR_MODE_BUTTONS = [
     [InlineKeyboardButton("رمادي",callback_data="Grayscale")],
     [InlineKeyboardButton("أحمر",callback_data="red")],
-    [InlineKeyboardButton("أخضر",callback_data="green")],
     [InlineKeyboardButton("أصفر",callback_data="yellow")],
     [InlineKeyboardButton("أزرق فاتح",callback_data="whiteblue")],
     [InlineKeyboardButton("أرجواني",callback_data="purple")]
@@ -950,9 +949,15 @@ def command20(bot,message):
 
 @bot.on_message(filters.command('ytsubplst') & filters.text & filters.private)
 def command20(bot,message):
-     ytlink = message.text.split("ytsubplst", maxsplit=1)[1].replace(" ", "")
+     ytlink = message.text.split(" ")[1]
      yt_id = message.from_user.id
-     ytsubplstfunc(ytlink,yt_id)
+     if len(message.text.split(" ")) == 2 :
+      ytsubplstfunc(ytlink,yt_id,0)
+      ytplstfunc(url,dlmode,ytplstid,0)
+     elif len(message.text.split(" ")) == 3 :
+      numpy = message.text.split(" ")[-1] 
+      ytsubplstfunc(ytlink,yt_id,numpy)
+
      
  
      
